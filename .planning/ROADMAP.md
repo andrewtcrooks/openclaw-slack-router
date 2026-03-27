@@ -12,6 +12,12 @@
 
 **Requirements:** SLACK-01, SLACK-02, SLACK-03, SLACK-04, SLACK-05, SLACK-06, CFG-01, CFG-02
 
+**Plans:** 2 plans
+
+Plans:
+- [ ] 01-01-PLAN.md — Project scaffold, config/env validation with zod, types, subagent-config stub
+- [ ] 01-02-PLAN.md — Bolt app factory, event handlers (app_mention + DM), reply helper, entry point
+
 **Success Criteria:**
 1. `SLACK_BOT_TOKEN` and `SLACK_APP_TOKEN` env vars are loaded; service fails with a clear error if missing
 2. Service connects to Slack via Socket Mode without a public URL
