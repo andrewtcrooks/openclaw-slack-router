@@ -3,12 +3,12 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: in-progress
-last_updated: "2026-03-29T22:01:23Z"
+last_updated: "2026-03-29T22:09:00Z"
 progress:
   total_phases: 3
-  completed_phases: 0
+  completed_phases: 1
   total_plans: 2
-  completed_plans: 1
+  completed_plans: 2
 ---
 
 # Project State: openclaw-slack-router
@@ -22,12 +22,12 @@ See: .planning/PROJECT.md (updated 2026-03-27)
 
 ## Current Status
 
-- Phase 1: ◐ In progress (Plan 01 complete, Plan 02 pending)
+- Phase 1: ● Complete (Plan 01 + Plan 02 done)
 - Phase 2: ○ Not started
 - Phase 3: ○ Not started
 
-**Current Plan:** 01-02 (Bolt app factory, event handlers, entry point)
-**Last Completed:** 01-01 (Project scaffold, config/env validation)
+**Current Plan:** Phase 1 complete, next is Phase 02
+**Last Completed:** 01-02 (Bolt app factory, event handlers, entry point)
 
 ## Key Decisions Log
 
@@ -39,13 +39,16 @@ See: .planning/PROJECT.md (updated 2026-03-27)
 | 2026-03-27 | TypeScript + @slack/bolt | Matches openclaw ecosystem; proven patterns available |
 | 2026-03-29 | Zod safeParse for env validation | Clear error messages listing all invalid fields; typed output |
 | 2026-03-29 | Flat src/ structure for phase 1 | No subdirectories yet; keeps it simple until event handlers added |
+| 2026-03-29 | `any` type for app param in event handlers | Avoids ESM/CJS type import complexity with @slack/bolt; runtime correctness verified by tests |
+| 2026-03-29 | ESM/CJS interop pattern from openclaw ref | Applied provider.ts lines 38-45 pattern for reliable @slack/bolt import |
 
 ## Performance Metrics
 
 | Phase-Plan | Duration | Tasks | Files |
 |------------|----------|-------|-------|
 | 01-01 | 2min | 2 | 9 |
+| 01-02 | 3min | 2 | 9 |
 
 ---
 *Initialized: 2026-03-27*
-*Last session: 2026-03-29T22:01:23Z — Completed 01-01-PLAN.md*
+*Last session: 2026-03-29T22:09:00Z — Completed 01-02-PLAN.md*
