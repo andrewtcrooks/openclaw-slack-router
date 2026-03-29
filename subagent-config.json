@@ -1,0 +1,9 @@
+{
+  "defaultAgent": "echo",
+  "agents": {
+    "echo": {
+      "name": "echo",
+      "description": "Echoes back the user's message (placeholder)"
+    }
+  }
+}
