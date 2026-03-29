@@ -10,7 +10,7 @@
 - [ ] **SLACK-01**: Rook receives app mentions in public channels it has joined
 - [ ] **SLACK-02**: Rook receives direct messages from users
 - [ ] **SLACK-03**: Rook replies within the Slack thread of the triggering message
-- [ ] **SLACK-04**: Bot token and app token are loaded from environment variables
+- [x] **SLACK-04**: Bot token and app token are loaded from environment variables
 - [ ] **SLACK-05**: Service operates in Socket Mode (no public webhook endpoint required)
 - [ ] **SLACK-06**: Rook can join public channels on demand
 
@@ -41,8 +41,8 @@
 
 ### Configuration
 
-- [ ] **CFG-01**: Subagent routing table is defined in a config file (not hardcoded)
-- [ ] **CFG-02**: Service reads SLACK_BOT_TOKEN and SLACK_APP_TOKEN from env
+- [x] **CFG-01**: Subagent routing table is defined in a config file (not hardcoded)
+- [x] **CFG-02**: Service reads SLACK_BOT_TOKEN and SLACK_APP_TOKEN from env
 
 ## v2 Requirements
 
@@ -77,11 +77,11 @@
 | SLACK-01 | Phase 1 | Pending |
 | SLACK-02 | Phase 1 | Pending |
 | SLACK-03 | Phase 1 | Pending |
-| SLACK-04 | Phase 1 | Pending |
+| SLACK-04 | Phase 1 | Complete |
 | SLACK-05 | Phase 1 | Pending |
 | SLACK-06 | Phase 1 | Pending |
-| CFG-01 | Phase 1 | Pending |
-| CFG-02 | Phase 1 | Pending |
+| CFG-01 | Phase 1 | Complete |
+| CFG-02 | Phase 1 | Complete |
 | ROUTE-01 | Phase 2 | Pending |
 | ROUTE-02 | Phase 2 | Pending |
 | ROUTE-03 | Phase 2 | Pending |

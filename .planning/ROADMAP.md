@@ -15,7 +15,7 @@
 **Plans:** 2 plans
 
 Plans:
-- [ ] 01-01-PLAN.md — Project scaffold, config/env validation with zod, types, subagent-config stub
+- [x] 01-01-PLAN.md — Project scaffold, config/env validation with zod, types, subagent-config stub
 - [ ] 01-02-PLAN.md — Bolt app factory, event handlers (app_mention + DM), reply helper, entry point
 
 **Success Criteria:**
