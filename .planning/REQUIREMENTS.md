@@ -23,14 +23,15 @@
 
 ### Context Management
 
-- [ ] **CTX-01**: Full Slack thread history is fetched before every subagent call
-- [ ] **CTX-02**: Thread history is formatted and included as conversation context in the subagent call
-- [ ] **CTX-03**: Each Slack thread is treated as an isolated conversation (no cross-thread bleed)
+- [ ] **CTX-01**: Full channel history is fetched via `conversations.history` before every subagent call
+- [ ] **CTX-02**: Channel history is formatted as `{role, content}[]` and included as conversation context in the subagent call
+- [ ] **CTX-03**: Each Slack channel is an isolated context — history from one channel never appears in another channel's calls
+- [ ] **CTX-04**: History fetch limit is configurable per channel (maps to `historyLimit` in config)
 
-### Thread Management
+### Channel Management
 
-- [ ] **THREAD-01**: Users can start a new conversation thread via a Slack command or mention
-- [ ] **THREAD-02**: Rook's responses are always posted in-thread (not as top-level channel messages)
+- [ ] **CHAN-01**: Each project gets its own Slack channel (e.g., #rook-openclaw, #rook-datanova)
+- [ ] **CHAN-02**: Rook replies in-thread within a channel (keeps channel readable), but the context sent to the subagent is always the full channel history — not thread replies only
 
 ### Subagent Interface
 

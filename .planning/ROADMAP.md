@@ -30,18 +30,19 @@ Plans:
 
 ## Phase 2: Message Router + Context Gooping
 
-**Goal:** Incoming messages are routed to the correct subagent based on explicit commands or prefixes. Full Slack thread history is fetched and included in every subagent call. Each thread is an isolated conversation.
+**Goal:** Incoming messages are routed to the correct subagent. Full channel history is fetched via `conversations.history` and included in every subagent call. Each channel is an isolated context — threads inside a channel are supported but disposable (channel history is the authoritative context, not thread replies).
 
-**Requirements:** ROUTE-01, ROUTE-02, ROUTE-03, ROUTE-04, CTX-01, CTX-02, CTX-03, THREAD-01, THREAD-02
+**Requirements:** ROUTE-01, ROUTE-02, ROUTE-03, ROUTE-04, CTX-01, CTX-02, CTX-03, CTX-04, CHAN-01, CHAN-02
 
 **Success Criteria:**
 1. `/rook <agent-name> <message>` or `@rook @agent-name <message>` dispatches to the named subagent
 2. A message with no explicit subagent prefix routes to the default subagent
 3. An unknown subagent name returns an informative error message in-thread
-4. `channels.history` / `conversations.replies` is called before every subagent dispatch to fetch the full thread
-5. Thread history is formatted as an array of `{role, content}` messages and passed to the subagent
-6. Messages in thread A never appear in thread B's context
-7. A user can start a new thread by posting a top-level message (not a reply)
+4. `conversations.history` is called with configurable `historyLimit` before every subagent dispatch
+5. Channel history is formatted as `{role, content}[]` and passed to the subagent
+6. Messages in #rook-openclaw never appear in #rook-datanova context calls
+7. Threads inside a channel are replied-to correctly, but context always comes from the full channel history
+8. A new project = a new Slack channel; Rook joins it and begins accumulating context there
 
 ---
 

@@ -6,7 +6,7 @@ A Slack-based message router for the Rook agent that receives messages via Slack
 
 ## Core Value
 
-Any message sent to Rook in Slack reaches the right subagent with full thread context — so every call is informed by the complete conversation history.
+Each Slack channel is an isolated project context — messages in #rook-openclaw only see openclaw history, messages in #rook-datanova only see datanova history. No cross-project token burn, no context bleed.
 
 ## Requirements
 
@@ -39,8 +39,8 @@ Any message sent to Rook in Slack reaches the right subagent with full thread co
 - **OAuth scopes already enabled**: app_mentions:read, A:write (agent), channels:history, channels:join, chat:write, groups:history
 - **Reference implementation**: `/Users/andrew/git/openclaw/src/slack/` shows how openclaw uses `@slack/bolt` for Slack integration — useful for patterns but this is a standalone service
 - **Subagent routing**: Each message should be dispatched to a specific subagent (not a single LLM). Routing mechanism TBD (slash commands, prefixes, or LLM classifier).
-- **Context strategy**: The full Slack thread history is fetched and included in every subagent call — stateless calls with full context each time.
-- **Thread model**: Each conversation lives in a Slack thread. Users can create new threads to start fresh conversations with different subagents.
+- **Context strategy**: Channel history is fetched via `conversations.history` with a configurable `historyLimit` and included in every subagent call. Channel-per-project = isolated context per project. NOT thread-based — Slack thread context is unreliable (no automatic prior-history injection, known misclassification bugs).
+- **Channel model**: One Slack channel per project/concern (#rook-openclaw, #rook-datanova, etc.). Threads inside a channel are disposable sub-discussions (debug, brainstorm) — not primary memory boundaries.
 
 ## Constraints
 
@@ -55,8 +55,9 @@ Any message sent to Rook in Slack reaches the right subagent with full thread co
 |----------|-----------|---------|
 | Slack over Telegram | Better thread/channel UX, easier to create isolated conversations | — Pending |
 | Socket Mode | No need to expose a public endpoint | — Pending |
-| Thread = conversation unit | Each Slack thread is one conversation context | — Pending |
-| Context gooping | Full thread history sent with every call, no external memory | — Pending |
+| Channel = conversation unit | Each Slack channel is one isolated project context — not threads (thread context unreliable in Slack) | — Pending |
+| Channel history gooping | Full channel history (conversations.history + historyLimit) sent with every call | — Pending |
+| Threads = disposable | Threads inside channels are for lightweight sub-discussions only, not primary memory | — Pending |
 
 ---
 *Last updated: 2026-03-27 after initialization*
