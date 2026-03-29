@@ -12,7 +12,7 @@
 
 **Requirements:** SLACK-01, SLACK-02, SLACK-03, SLACK-04, SLACK-05, SLACK-06, CFG-01, CFG-02
 
-**Plans:** 2 plans
+**Plans:** 2/2 plans complete
 
 Plans:
 - [x] 01-01-PLAN.md — Project scaffold, config/env validation with zod, types, subagent-config stub
@@ -64,8 +64,7 @@ Plans:
 
 | Phase | REQ-IDs |
 |-------|---------|
-| 1 | SLACK-01, SLACK-02, SLACK-03, SLACK-04, SLACK-05, SLACK-06, CFG-01, CFG-02 |
-| 2 | ROUTE-01, ROUTE-02, ROUTE-03, ROUTE-04, CTX-01, CTX-02, CTX-03, THREAD-01, THREAD-02 |
+| 1 | SLACK-01, SLACK-02, SLACK-03, SLACK-04, SLACK-05, SLACK-06, CFG-01, CFG-02 | Complete    | 2026-03-29 | ROUTE-01, ROUTE-02, ROUTE-03, ROUTE-04, CTX-01, CTX-02, CTX-03, THREAD-01, THREAD-02 |
 | 3 | AGENT-01, AGENT-02, AGENT-03 |
 
 ---
