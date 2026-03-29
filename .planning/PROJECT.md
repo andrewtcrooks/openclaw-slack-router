@@ -12,7 +12,10 @@ Each Slack channel is an isolated project context — messages in #rook-openclaw
 
 ### Validated
 
-(None yet — ship to validate)
+- ✓ SLACK-04: Bot/app tokens loaded from env with zod validation — Phase 1
+- ✓ SLACK-05: Socket Mode connection (no public URL) — Phase 1
+- ✓ CFG-01: Subagent routing table in config file — Phase 1
+- ✓ CFG-02: SLACK_BOT_TOKEN + SLACK_APP_TOKEN from env — Phase 1
 
 ### Active
 
@@ -60,4 +63,4 @@ Each Slack channel is an isolated project context — messages in #rook-openclaw
 | Threads = disposable | Threads inside channels are for lightweight sub-discussions only, not primary memory | — Pending |
 
 ---
-*Last updated: 2026-03-27 after initialization*
+*Last updated: 2026-03-29 after Phase 1 complete*
