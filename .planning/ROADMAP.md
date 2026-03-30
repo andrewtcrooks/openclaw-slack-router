@@ -34,6 +34,13 @@ Plans:
 
 **Requirements:** ROUTE-01, ROUTE-02, ROUTE-03, ROUTE-04, CTX-01, CTX-02, CTX-03, CTX-04, CHAN-01, CHAN-02
 
+**Plans:** 3 plans
+
+Plans:
+- [ ] 02-01-PLAN.md — Pure router: resolveRoute, UnknownAgentError, extended types (SubagentContext, HistoryMessage, ChannelConfig)
+- [ ] 02-02-PLAN.md — Context builder: buildSubagentContext fetches channel history, formats as HistoryMessage[]
+- [ ] 02-03-PLAN.md — Wire router + context into event handlers; auth.test() botUserId at startup; end-to-end stub dispatch
+
 **Success Criteria:**
 1. `/rook <agent-name> <message>` or `@rook @agent-name <message>` dispatches to the named subagent
 2. A message with no explicit subagent prefix routes to the default subagent
@@ -64,8 +71,10 @@ Plans:
 
 | Phase | REQ-IDs |
 |-------|---------|
-| 1 | SLACK-01, SLACK-02, SLACK-03, SLACK-04, SLACK-05, SLACK-06, CFG-01, CFG-02 | Complete    | 2026-03-29 | ROUTE-01, ROUTE-02, ROUTE-03, ROUTE-04, CTX-01, CTX-02, CTX-03, THREAD-01, THREAD-02 |
+| 1 | SLACK-01, SLACK-02, SLACK-03, SLACK-04, SLACK-05, SLACK-06, CFG-01, CFG-02 |
+| 2 | ROUTE-01, ROUTE-02, ROUTE-03, ROUTE-04, CTX-01, CTX-02, CTX-03, CTX-04, CHAN-01, CHAN-02 |
 | 3 | AGENT-01, AGENT-02, AGENT-03 |
 
 ---
 *Roadmap created: 2026-03-27*
+*Last updated: 2026-03-29 — Phase 2 plans created*
