@@ -1,6 +1,7 @@
 import SlackBolt from "@slack/bolt";
 import type { AppConfig } from "./config.js";
 import type { SubagentConfig } from "./types.js";
+import type { SubagentRegistry } from "./subagents/index.js";
 import { registerAppMentionHandler } from "./events/app-mention.js";
 import { registerMessageHandler } from "./events/message.js";
 
@@ -16,6 +17,7 @@ export function createApp(
   config: AppConfig,
   subagentConfig: SubagentConfig,
   botUserId: string,
+  subagentRegistry: SubagentRegistry,
 ): InstanceType<typeof App> {
   const app = new App({
     token: config.SLACK_BOT_TOKEN,
@@ -23,8 +25,8 @@ export function createApp(
     socketMode: true,
   });
 
-  registerAppMentionHandler(app, subagentConfig, botUserId);
-  registerMessageHandler(app, subagentConfig, botUserId);
+  registerAppMentionHandler(app, subagentConfig, botUserId, subagentRegistry);
+  registerMessageHandler(app, subagentConfig, botUserId, subagentRegistry);
 
   return app;
 }

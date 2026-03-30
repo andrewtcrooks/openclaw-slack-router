@@ -1,6 +1,7 @@
 import "dotenv/config";
 import { loadConfig, loadSubagentConfig } from "./config.js";
 import { createApp } from "./app.js";
+import { buildSubagentRegistry } from "./subagents/index.js";
 
 async function main() {
   const config = loadConfig();
@@ -25,7 +26,10 @@ async function main() {
   const authResult = await client.auth.test();
   const botUserId = authResult.user_id as string;
 
-  const app = createApp(config, subagentConfig, botUserId);
+  const gatewayUrl = process.env.OPENCLAW_GATEWAY_URL ?? "ws://127.0.0.1:18789";
+  const subagentRegistry = buildSubagentRegistry(gatewayUrl);
+
+  const app = createApp(config, subagentConfig, botUserId, subagentRegistry);
   await app.start();
   console.log(`Rook is running in Socket Mode (bot user: ${botUserId})`);
 }

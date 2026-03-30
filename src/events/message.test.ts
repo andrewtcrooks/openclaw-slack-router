@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { registerMessageHandler } from "./message.js";
 import type { SubagentConfig } from "../types.js";
+import type { SubagentRegistry } from "../subagents/index.js";
 
 describe("registerMessageHandler", () => {
   let mockApp: { event: ReturnType<typeof vi.fn> };
@@ -16,6 +17,14 @@ describe("registerMessageHandler", () => {
   };
   const botUserId = "UBOT1";
 
+  const mockRegistry: SubagentRegistry = {
+    echo: {
+      name: "echo",
+      description: "Echo agent",
+      handle: async (ctx) => `Echo: ${ctx.currentMessage}`,
+    },
+  };
+
   const makeClient = () => ({
     conversations: {
       history: vi.fn().mockResolvedValue({ messages: [], has_more: false }),
@@ -24,14 +33,14 @@ describe("registerMessageHandler", () => {
 
   beforeEach(() => {
     mockApp = { event: vi.fn() };
-    registerMessageHandler(mockApp, config, botUserId);
+    registerMessageHandler(mockApp, config, botUserId, mockRegistry);
     const messageCall = mockApp.event.mock.calls.find(
       (call: unknown[]) => call[0] === "message",
     );
     handler = messageCall![1] as typeof handler;
   });
 
-  it("routes DM to default agent and replies in thread with [agentName]", async () => {
+  it("routes DM to default agent and replies in thread via subagent.handle()", async () => {
     const event = {
       channel_type: "im",
       channel: "D123",
@@ -48,7 +57,7 @@ describe("registerMessageHandler", () => {
       expect.objectContaining({ thread_ts: "1234.5678" }),
     );
     const callArg = say.mock.calls[0][0] as { text: string };
-    expect(callArg.text).toContain("[echo]");
+    expect(callArg.text).toContain("Echo:");
   });
 
   it("routes DM via slash prefix to named agent", async () => {
@@ -59,8 +68,16 @@ describe("registerMessageHandler", () => {
         research: { name: "research", description: "Research agent" },
       },
     };
+    const localRegistry: SubagentRegistry = {
+      ...mockRegistry,
+      research: {
+        name: "research",
+        description: "Research agent",
+        handle: async (ctx) => `Research: ${ctx.currentMessage}`,
+      },
+    };
     mockApp = { event: vi.fn() };
-    registerMessageHandler(mockApp, localConfig, botUserId);
+    registerMessageHandler(mockApp, localConfig, botUserId, localRegistry);
     const messageCall = mockApp.event.mock.calls.find(
       (call: unknown[]) => call[0] === "message",
     );
@@ -79,7 +96,7 @@ describe("registerMessageHandler", () => {
     await localHandler({ event, client, say });
 
     const callArg = say.mock.calls[0][0] as { text: string };
-    expect(callArg.text).toContain("[research]");
+    expect(callArg.text).toContain("Research:");
   });
 
   it("ignores non-DM messages", async () => {
@@ -169,7 +186,22 @@ describe("registerMessageHandler", () => {
     expect(callArg.text).toContain("Unknown agent");
   });
 
-  it("includes history count in stub reply", async () => {
+  it("calls subagent.handle with SubagentContext containing threadHistory", async () => {
+    const handleSpy = vi.fn().mockResolvedValue("response");
+    const spyRegistry: SubagentRegistry = {
+      echo: {
+        name: "echo",
+        description: "Echo agent",
+        handle: handleSpy,
+      },
+    };
+    mockApp = { event: vi.fn() };
+    registerMessageHandler(mockApp, config, botUserId, spyRegistry);
+    const messageCall = mockApp.event.mock.calls.find(
+      (call: unknown[]) => call[0] === "message",
+    );
+    const localHandler = messageCall![1] as typeof handler;
+
     const event = {
       channel_type: "im",
       channel: "D123",
@@ -177,19 +209,45 @@ describe("registerMessageHandler", () => {
       ts: "1234.5678",
       text: "hello",
     };
-    const client = {
-      conversations: {
-        history: vi.fn().mockResolvedValue({
-          messages: [{ text: "msg1", user: "U111" }],
-          has_more: false,
-        }),
-      },
-    };
+    const client = makeClient();
     const say = vi.fn().mockResolvedValue({});
 
-    await handler({ event, client, say });
+    await localHandler({ event, client, say });
+
+    expect(handleSpy).toHaveBeenCalledOnce();
+    const ctx = handleSpy.mock.calls[0][0];
+    expect(ctx).toHaveProperty("threadHistory");
+    expect(ctx).not.toHaveProperty("history");
+  });
+
+  it("replies with 'No subagent implementation registered' when agent in config but not in registry", async () => {
+    const localConfig: SubagentConfig = {
+      defaultAgent: "ghost",
+      agents: {
+        ghost: { name: "ghost", description: "Ghost agent" },
+      },
+    };
+    const emptyRegistry: SubagentRegistry = {};
+    mockApp = { event: vi.fn() };
+    registerMessageHandler(mockApp, localConfig, botUserId, emptyRegistry);
+    const messageCall = mockApp.event.mock.calls.find(
+      (call: unknown[]) => call[0] === "message",
+    );
+    const localHandler = messageCall![1] as typeof handler;
+
+    const event = {
+      channel_type: "im",
+      channel: "D123",
+      user: "U456",
+      ts: "1234.5678",
+      text: "hello",
+    };
+    const client = makeClient();
+    const say = vi.fn().mockResolvedValue({});
+
+    await localHandler({ event, client, say });
 
     const callArg = say.mock.calls[0][0] as { text: string };
-    expect(callArg.text).toContain("1 history msgs");
+    expect(callArg.text).toContain("No subagent implementation registered");
   });
 });

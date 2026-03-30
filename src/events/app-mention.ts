@@ -2,6 +2,7 @@ import { resolveThreadTs } from "../handlers/reply.js";
 import { resolveRoute, UnknownAgentError } from "../router.js";
 import { buildSubagentContext } from "../context.js";
 import type { SubagentConfig } from "../types.js";
+import type { SubagentRegistry } from "../subagents/index.js";
 
 // Using `any` for app parameter to avoid ESM/CJS type import issues with @slack/bolt.
 // The runtime behavior is verified by tests; TypeScript types for Bolt's App class
@@ -11,6 +12,7 @@ export function registerAppMentionHandler(
   app: any,
   config: SubagentConfig,
   botUserId: string,
+  subagentRegistry: SubagentRegistry,
 ): void {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   app.event("app_mention", async ({ event, client, say }: any) => {
@@ -37,11 +39,13 @@ export function registerAppMentionHandler(
         botUserId,
       });
 
-      // Phase 2 stub dispatch — Phase 3 replaces with real subagent execution
-      await say({
-        text: `[${context.agentName}] ${context.currentMessage} (${context.history.length} history msgs)`,
-        thread_ts: threadTs,
-      });
+      const subagent = subagentRegistry[route.agentName];
+      if (!subagent) {
+        await say({ text: `No subagent implementation registered for "${route.agentName}"`, thread_ts: threadTs });
+        return;
+      }
+      const response = await subagent.handle(context);
+      await say({ text: response, thread_ts: threadTs });
     } catch (err) {
       const message =
         err instanceof UnknownAgentError

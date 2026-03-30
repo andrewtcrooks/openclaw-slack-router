@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import type { SubagentConfig } from "./types.js";
+import type { SubagentRegistry } from "./subagents/index.js";
 
 // Track constructor calls and event registrations
 const mockEventFn = vi.fn();
@@ -33,9 +34,10 @@ describe("createApp", () => {
     agents: { echo: { name: "echo", description: "Echo agent" } },
   };
   const botUserId = "UBOT1";
+  const registry: SubagentRegistry = {};
 
   it("creates App with socketMode: true", () => {
-    createApp(config, subagentConfig, botUserId);
+    createApp(config, subagentConfig, botUserId, registry);
     expect(mockConstructor).toHaveBeenCalledWith({
       token: "xoxb-test",
       appToken: "xapp-test",
@@ -44,7 +46,7 @@ describe("createApp", () => {
   });
 
   it("registers app_mention event handler", () => {
-    createApp(config, subagentConfig, botUserId);
+    createApp(config, subagentConfig, botUserId, registry);
     const eventCalls = mockEventFn.mock.calls.map(
       (call: unknown[]) => call[0],
     );
@@ -52,7 +54,7 @@ describe("createApp", () => {
   });
 
   it("registers message event handler", () => {
-    createApp(config, subagentConfig, botUserId);
+    createApp(config, subagentConfig, botUserId, registry);
     const eventCalls = mockEventFn.mock.calls.map(
       (call: unknown[]) => call[0],
     );
