@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { registerAppMentionHandler } from "./app-mention.js";
+import type { SubagentConfig } from "../types.js";
 
 describe("registerAppMentionHandler", () => {
   let mockApp: { event: ReturnType<typeof vi.fn> };
@@ -9,9 +10,22 @@ describe("registerAppMentionHandler", () => {
     say: ReturnType<typeof vi.fn>;
   }) => Promise<void>;
 
+  const config: SubagentConfig = {
+    defaultAgent: "echo",
+    agents: { echo: { name: "echo", description: "Echo agent" } },
+  };
+  const botUserId = "UBOT1";
+
+  const makeClient = () => ({
+    conversations: {
+      join: vi.fn().mockResolvedValue({}),
+      history: vi.fn().mockResolvedValue({ messages: [], has_more: false }),
+    },
+  });
+
   beforeEach(() => {
     mockApp = { event: vi.fn() };
-    registerAppMentionHandler(mockApp);
+    registerAppMentionHandler(mockApp, config, botUserId);
     const appMentionCall = mockApp.event.mock.calls.find(
       (call: unknown[]) => call[0] === "app_mention",
     );
@@ -19,10 +33,13 @@ describe("registerAppMentionHandler", () => {
   });
 
   it("calls conversations.join with the channel", async () => {
-    const event = { channel: "C123", user: "U456", ts: "1234.5678" };
-    const client = {
-      conversations: { join: vi.fn().mockResolvedValue({}) },
+    const event = {
+      channel: "C123",
+      user: "U456",
+      ts: "1234.5678",
+      text: "<@UBOT1> hello",
     };
+    const client = makeClient();
     const say = vi.fn().mockResolvedValue({});
 
     await handler({ event, client, say });
@@ -32,11 +49,14 @@ describe("registerAppMentionHandler", () => {
     });
   });
 
-  it("replies in thread with user mention", async () => {
-    const event = { channel: "C123", user: "U456", ts: "1234.5678" };
-    const client = {
-      conversations: { join: vi.fn().mockResolvedValue({}) },
+  it("routes to default agent and replies in thread with [agentName]", async () => {
+    const event = {
+      channel: "C123",
+      user: "U456",
+      ts: "1234.5678",
+      text: "<@UBOT1> hello there",
     };
+    const client = makeClient();
     const say = vi.fn().mockResolvedValue({});
 
     await handler({ event, client, say });
@@ -45,7 +65,37 @@ describe("registerAppMentionHandler", () => {
       expect.objectContaining({ thread_ts: "1234.5678" }),
     );
     const callArg = say.mock.calls[0][0] as { text: string };
-    expect(callArg.text).toContain("<@U456>");
+    expect(callArg.text).toContain("[echo]");
+  });
+
+  it("routes to named agent via slash prefix", async () => {
+    const localConfig: SubagentConfig = {
+      defaultAgent: "echo",
+      agents: {
+        echo: { name: "echo", description: "Echo agent" },
+        research: { name: "research", description: "Research agent" },
+      },
+    };
+    mockApp = { event: vi.fn() };
+    registerAppMentionHandler(mockApp, localConfig, botUserId);
+    const appMentionCall = mockApp.event.mock.calls.find(
+      (call: unknown[]) => call[0] === "app_mention",
+    );
+    const localHandler = appMentionCall![1] as typeof handler;
+
+    const event = {
+      channel: "C123",
+      user: "U456",
+      ts: "1234.5678",
+      text: "<@UBOT1> /research do this task",
+    };
+    const client = makeClient();
+    const say = vi.fn().mockResolvedValue({});
+
+    await localHandler({ event, client, say });
+
+    const callArg = say.mock.calls[0][0] as { text: string };
+    expect(callArg.text).toContain("[research]");
   });
 
   it("replies in existing thread using thread_ts", async () => {
@@ -54,10 +104,9 @@ describe("registerAppMentionHandler", () => {
       user: "U456",
       ts: "1234.5678",
       thread_ts: "1111.2222",
+      text: "<@UBOT1> hello",
     };
-    const client = {
-      conversations: { join: vi.fn().mockResolvedValue({}) },
-    };
+    const client = makeClient();
     const say = vi.fn().mockResolvedValue({});
 
     await handler({ event, client, say });
@@ -68,7 +117,12 @@ describe("registerAppMentionHandler", () => {
   });
 
   it("continues if conversations.join throws", async () => {
-    const event = { channel: "C123", user: "U456", ts: "1234.5678" };
+    const event = {
+      channel: "C123",
+      user: "U456",
+      ts: "1234.5678",
+      text: "<@UBOT1> hello",
+    };
     const client = {
       conversations: {
         join: vi
@@ -76,6 +130,7 @@ describe("registerAppMentionHandler", () => {
           .mockRejectedValue(
             new Error("method_not_supported_for_channel_type"),
           ),
+        history: vi.fn().mockResolvedValue({ messages: [], has_more: false }),
       },
     };
     const say = vi.fn().mockResolvedValue({});
@@ -83,5 +138,51 @@ describe("registerAppMentionHandler", () => {
     await handler({ event, client, say });
 
     expect(say).toHaveBeenCalled();
+  });
+
+  it("replies with Unknown agent error message for unknown agent", async () => {
+    const event = {
+      channel: "C123",
+      user: "U456",
+      ts: "1234.5678",
+      text: "<@UBOT1> /nonexistent do something",
+    };
+    const client = makeClient();
+    const say = vi.fn().mockResolvedValue({});
+
+    await handler({ event, client, say });
+
+    expect(say).toHaveBeenCalledWith(
+      expect.objectContaining({ thread_ts: "1234.5678" }),
+    );
+    const callArg = say.mock.calls[0][0] as { text: string };
+    expect(callArg.text).toContain("Unknown agent");
+  });
+
+  it("includes history count in stub reply", async () => {
+    const event = {
+      channel: "C123",
+      user: "U456",
+      ts: "1234.5678",
+      text: "<@UBOT1> hello",
+    };
+    const client = {
+      conversations: {
+        join: vi.fn().mockResolvedValue({}),
+        history: vi.fn().mockResolvedValue({
+          messages: [
+            { text: "msg1", user: "U111" },
+            { text: "msg2", user: "U222" },
+          ],
+          has_more: false,
+        }),
+      },
+    };
+    const say = vi.fn().mockResolvedValue({});
+
+    await handler({ event, client, say });
+
+    const callArg = say.mock.calls[0][0] as { text: string };
+    expect(callArg.text).toContain("2 history msgs");
   });
 });
