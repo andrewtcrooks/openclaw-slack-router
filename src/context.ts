@@ -60,7 +60,7 @@ export async function buildSubagentContext(params: {
     userId,
     threadTs,
     currentMessage,
-    history,
+    threadHistory: history,
     agentName,
   };
 }

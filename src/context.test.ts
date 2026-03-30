@@ -53,7 +53,7 @@ describe("buildSubagentContext", () => {
   it("returns empty history array when no messages returned", async () => {
     const client = makeClient([]);
     const result = await buildSubagentContext({ ...baseParams, client });
-    expect(result.history).toEqual([]);
+    expect(result.threadHistory).toEqual([]);
   });
 
   it("filters out messages with subtype field", async () => {
@@ -63,8 +63,8 @@ describe("buildSubagentContext", () => {
       { ts: "3", text: "world", user: "U300" },
     ]);
     const result = await buildSubagentContext({ ...baseParams, client });
-    expect(result.history).toHaveLength(2);
-    expect(result.history.every((m) => m.content !== "joined")).toBe(true);
+    expect(result.threadHistory).toHaveLength(2);
+    expect(result.threadHistory.every((m) => m.content !== "joined")).toBe(true);
   });
 
   it("maps bot_id messages to role: 'assistant'", async () => {
@@ -72,7 +72,7 @@ describe("buildSubagentContext", () => {
       { ts: "1", text: "I am a bot", bot_id: "B123" },
     ]);
     const result = await buildSubagentContext({ ...baseParams, client });
-    expect(result.history[0]).toEqual({ role: "assistant", content: "I am a bot" });
+    expect(result.threadHistory[0]).toEqual({ role: "assistant", content: "I am a bot" });
   });
 
   it("maps user messages (no bot_id) to role: 'user'", async () => {
@@ -80,7 +80,7 @@ describe("buildSubagentContext", () => {
       { ts: "1", text: "I am a human", user: "U999" },
     ]);
     const result = await buildSubagentContext({ ...baseParams, client });
-    expect(result.history[0]).toEqual({ role: "user", content: "I am a human" });
+    expect(result.threadHistory[0]).toEqual({ role: "user", content: "I am a human" });
   });
 
   it("reverses messages to chronological order (oldest-first)", async () => {
@@ -90,9 +90,9 @@ describe("buildSubagentContext", () => {
       { ts: "1", text: "oldest", user: "U1" },
     ]);
     const result = await buildSubagentContext({ ...baseParams, client });
-    expect(result.history[0].content).toBe("oldest");
-    expect(result.history[1].content).toBe("middle");
-    expect(result.history[2].content).toBe("newest");
+    expect(result.threadHistory[0].content).toBe("oldest");
+    expect(result.threadHistory[1].content).toBe("middle");
+    expect(result.threadHistory[2].content).toBe("newest");
   });
 
   it("SubagentContext contains channelId, userId, threadTs, currentMessage, agentName from params", async () => {
@@ -112,7 +112,7 @@ describe("buildSubagentContext", () => {
       { ts: "3", text: "", user: "U3" },
     ]);
     const result = await buildSubagentContext({ ...baseParams, client });
-    expect(result.history).toHaveLength(1);
-    expect(result.history[0].content).toBe("has text");
+    expect(result.threadHistory).toHaveLength(1);
+    expect(result.threadHistory[0].content).toBe("has text");
   });
 });

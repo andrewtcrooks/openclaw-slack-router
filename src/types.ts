@@ -17,7 +17,7 @@ export interface SubagentContext {
   userId: string;
   threadTs: string;
   currentMessage: string;
-  history: HistoryMessage[];
+  threadHistory: HistoryMessage[];
   agentName: string;
 }
 
