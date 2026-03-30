@@ -17,6 +17,12 @@ Each Slack channel is an isolated project context — messages in #rook-openclaw
 - ✓ CFG-01: Subagent routing table in config file — Phase 1
 - ✓ CFG-02: SLACK_BOT_TOKEN + SLACK_APP_TOKEN from env — Phase 1
 
+### Validated (continued)
+
+- ✓ AGENT-01: SubagentDefinition interface + SubagentRegistry type — Phase 3
+- ✓ AGENT-02: Registry-based dispatch in both event handlers — Phase 3
+- ✓ AGENT-03: openclaw-gateway subagent (WebSocket protocol) registered as default — Phase 3
+
 ### Active
 
 - [ ] Rook receives messages via Slack (mentions in channels, DMs)
@@ -63,4 +69,4 @@ Each Slack channel is an isolated project context — messages in #rook-openclaw
 | Threads = disposable | Threads inside channels are for lightweight sub-discussions only, not primary memory | — Pending |
 
 ---
-*Last updated: 2026-03-29 after Phase 1 complete*
+*Last updated: 2026-03-30 after Phase 3 complete — subagent interface + openclaw-gateway dispatch working*
