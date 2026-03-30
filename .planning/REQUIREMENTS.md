@@ -89,8 +89,9 @@
 | CTX-01 | Phase 2 | Pending |
 | CTX-02 | Phase 2 | Pending |
 | CTX-03 | Phase 2 | Pending |
-| THREAD-01 | Phase 2 | Pending |
-| THREAD-02 | Phase 2 | Pending |
+| CTX-04 | Phase 2 | Pending |
+| CHAN-01 | Phase 2 | Pending |
+| CHAN-02 | Phase 2 | Pending |
 | AGENT-01 | Phase 3 | Pending |
 | AGENT-02 | Phase 3 | Pending |
 | AGENT-03 | Phase 3 | Pending |
