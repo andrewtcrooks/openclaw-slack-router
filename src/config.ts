@@ -20,9 +20,24 @@ export function loadConfig(): AppConfig {
   return result.data;
 }
 
+const channelConfigSchema = z.object({
+  historyLimit: z.number().int().positive().optional(),
+});
+
+const subagentEntrySchema = z.object({
+  name: z.string(),
+  description: z.string(),
+});
+
+const subagentConfigSchema = z.object({
+  defaultAgent: z.string(),
+  agents: z.record(subagentEntrySchema),
+  channelConfig: z.record(channelConfigSchema).optional(),
+});
+
 export function loadSubagentConfig(
-  path = "./subagent-config.json"
+  path = "./subagent-config.json",
 ): SubagentConfig {
   const raw = readFileSync(path, "utf-8");
-  return JSON.parse(raw) as SubagentConfig;
+  return subagentConfigSchema.parse(JSON.parse(raw));
 }

@@ -4,6 +4,11 @@
     "echo": {
       "name": "echo",
       "description": "Echoes back the user's message (placeholder)"
+    },
+    "research": {
+      "name": "research",
+      "description": "Research agent for deep investigation (stub)"
     }
-  }
+  },
+  "channelConfig": {}
 }
