@@ -72,7 +72,7 @@ Plans:
 | Phase | REQ-IDs |
 |-------|---------|
 | 1 | SLACK-01, SLACK-02, SLACK-03, SLACK-04, SLACK-05, SLACK-06, CFG-01, CFG-02 |
-| 2 | 3/3 | Complete   | 2026-03-30 | AGENT-01, AGENT-02, AGENT-03 |
+| 2 | 3/3 | Complete    | 2026-03-30 | AGENT-01, AGENT-02, AGENT-03 |
 
 ---
 *Roadmap created: 2026-03-27*
