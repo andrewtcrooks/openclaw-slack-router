@@ -35,9 +35,9 @@
 
 ### Subagent Interface
 
-- [ ] **AGENT-01**: Subagents are defined as TypeScript modules with a standard interface
-- [ ] **AGENT-02**: Each subagent receives: thread history, current message, and metadata (user, channel, thread_ts)
-- [ ] **AGENT-03**: Subagent responses are posted back to the Slack thread
+- [x] **AGENT-01**: Subagents are defined as TypeScript modules with a standard interface
+- [x] **AGENT-02**: Each subagent receives: thread history, current message, and metadata (user, channel, thread_ts)
+- [x] **AGENT-03**: Subagent responses are posted back to the Slack thread
 
 ### Configuration
 
@@ -92,9 +92,9 @@
 | CTX-04 | Phase 2 | Complete |
 | CHAN-01 | Phase 2 | Complete |
 | CHAN-02 | Phase 2 | Complete |
-| AGENT-01 | Phase 3 | Pending |
-| AGENT-02 | Phase 3 | Pending |
-| AGENT-03 | Phase 3 | Pending |
+| AGENT-01 | Phase 3 | Complete |
+| AGENT-02 | Phase 3 | Complete |
+| AGENT-03 | Phase 3 | Complete |
 
 **Coverage:**
 - v1 requirements: 20 total

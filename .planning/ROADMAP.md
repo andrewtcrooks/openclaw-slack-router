@@ -59,10 +59,10 @@ Plans:
 
 **Requirements:** AGENT-01, AGENT-02, AGENT-03
 
-**Plans:** 2 plans
+**Plans:** 1/2 plans complete
 
 Plans:
-- [ ] 03-01-PLAN.md — SubagentDefinition interface, threadHistory rename, registry skeleton, event handler wiring
+- [x] 03-01-PLAN.md — SubagentDefinition interface, threadHistory rename, registry skeleton, event handler wiring
 - [ ] 03-02-PLAN.md — Gateway chat client (WebSocket), openclaw-gateway subagent, registry registration
 
 **Success Criteria:**
@@ -83,4 +83,4 @@ Plans:
 
 ---
 *Roadmap created: 2026-03-27*
-*Last updated: 2026-03-30 — Phase 3 plans created*
+*Last updated: 2026-03-30 — Phase 3 Plan 01 complete*

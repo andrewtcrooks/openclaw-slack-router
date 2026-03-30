@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-current_plan: Not started
-status: unknown
-last_updated: "2026-03-30T02:31:05.174Z"
+current_plan: Plan 1 of 2 in Phase 3
+status: in-progress
+last_updated: "2026-03-30T18:37:00Z"
 progress:
   total_phases: 3
   completed_phases: 2
-  total_plans: 5
-  completed_plans: 5
+  total_plans: 7
+  completed_plans: 6
 ---
 
 # Project State: openclaw-slack-router
@@ -19,16 +19,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-27)
 
 **Core value:** Any message sent to Rook in Slack reaches the right subagent with full thread context
-**Current focus:** Phase 02 — message-router-context-gooping
+**Current focus:** Phase 03 — subagent-interface-first-real-subagent
 
 ## Current Status
 
 - Phase 1: ● Complete (Plan 01 + Plan 02 done)
 - Phase 2: ● Complete (Plans 01 + 02 + 03 done)
-- Phase 3: ○ Not started
+- Phase 3: ◐ In progress (Plan 01 done, Plan 02 pending)
 
-**Current Plan:** Not started
-**Last Completed:** 02-03 (event handler wiring — resolveRoute + buildSubagentContext integrated)
+**Current Plan:** Plan 1 of 2 in Phase 3
+**Last Completed:** 03-01 (subagent interface + registry — SubagentDefinition, registry dispatch, threadHistory rename)
 
 ## Key Decisions Log
 
@@ -47,6 +47,9 @@ See: .planning/PROJECT.md (updated 2026-03-27)
 | 2026-03-30 | Zod schema for subagentConfigSchema | Validates channelConfig field; replaces unsafe JSON.parse cast in loadSubagentConfig |
 | 2026-03-30 | Stub dispatch pattern in Phase 2 handlers | [agentName] + history count echoed; Phase 3 replaces with real subagent execution |
 | 2026-03-30 | botUserId resolved at startup via WebClient.auth.test() | Avoids circular dep; WebClient used directly before Bolt app creation |
+| 2026-03-30 | SubagentDefinition.handle returns Promise<string> | Simple text response contract; subagents return plain string |
+| 2026-03-30 | Registry miss returns user message, not exception | Graceful degradation when agent in config but not in registry |
+| 2026-03-30 | OPENCLAW_GATEWAY_URL defaults to ws://127.0.0.1:18789 | Local dev default for WebSocket gateway |
 
 ## Performance Metrics
 
@@ -59,6 +62,8 @@ See: .planning/PROJECT.md (updated 2026-03-27)
 | 02-02 | 4min | 2 | 3 |
 | 02-03 | 2min | 2 | 7 |
 
+| 03-01 | 4min | 2 | 14 |
+
 ---
 *Initialized: 2026-03-27*
-*Last session: 2026-03-30T02:24:40Z — Completed 02-03-PLAN.md*
+*Last session: 2026-03-30T18:37:00Z — Completed 03-01-PLAN.md*
