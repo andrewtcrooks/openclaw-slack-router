@@ -13,7 +13,7 @@ function startMockGateway(
     wss.on("connection", handler);
     wss.on("listening", () => {
       const addr = wss!.address();
-      resolve(typeof addr === "object" ? addr.port : 0);
+      resolve(typeof addr === "object" && addr !== null ? addr.port : 0);
     });
   });
 }
@@ -246,7 +246,7 @@ describe("gatewayChatSend", () => {
 
     expect(capturedConnectParams).toBeTruthy();
     expect(
-      (capturedConnectParams as Record<string, unknown>).auth,
+      (capturedConnectParams as unknown as Record<string, unknown>).auth,
     ).toEqual({ token: "test-token" });
   });
 

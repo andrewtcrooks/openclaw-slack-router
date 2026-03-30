@@ -5,8 +5,15 @@ import type { SubagentDefinition } from "./types.js";
 
 describe("buildSubagentRegistry", () => {
   it("returns an object (SubagentRegistry)", () => {
-    const registry = buildSubagentRegistry("ws://localhost:18789");
+    const registry = buildSubagentRegistry({ gatewayUrl: "ws://localhost:18789" });
     expect(typeof registry).toBe("object");
+  });
+
+  it("registry contains 'default' agent with name 'openclaw-gateway'", () => {
+    const registry = buildSubagentRegistry({ gatewayUrl: "ws://localhost:18789" });
+    expect(registry.default).toBeDefined();
+    expect(registry.default.name).toBe("openclaw-gateway");
+    expect(typeof registry.default.handle).toBe("function");
   });
 
   it("SubagentRegistry values conform to SubagentDefinition interface", () => {

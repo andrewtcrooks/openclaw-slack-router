@@ -27,7 +27,8 @@ async function main() {
   const botUserId = authResult.user_id as string;
 
   const gatewayUrl = process.env.OPENCLAW_GATEWAY_URL ?? "ws://127.0.0.1:18789";
-  const subagentRegistry = buildSubagentRegistry(gatewayUrl);
+  const gatewayToken = process.env.OPENCLAW_GATEWAY_TOKEN;
+  const subagentRegistry = buildSubagentRegistry({ gatewayUrl, gatewayToken });
 
   const app = createApp(config, subagentConfig, botUserId, subagentRegistry);
   await app.start();
