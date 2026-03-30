@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-current_plan: 1
+current_plan: 02-03
 status: unknown
-last_updated: "2026-03-30T02:20:06.995Z"
+last_updated: "2026-03-30T02:26:16.369Z"
 progress:
   total_phases: 3
-  completed_phases: 1
+  completed_phases: 2
   total_plans: 5
-  completed_plans: 4
+  completed_plans: 5
 ---
 
 # Project State: openclaw-slack-router
@@ -24,11 +24,11 @@ See: .planning/PROJECT.md (updated 2026-03-27)
 ## Current Status
 
 - Phase 1: ● Complete (Plan 01 + Plan 02 done)
-- Phase 2: ◑ In progress (Plans 01 + 02 done)
+- Phase 2: ● Complete (Plans 01 + 02 + 03 done)
 - Phase 3: ○ Not started
 
-**Current Plan:** 02-03
-**Last Completed:** 02-02 (buildSubagentContext — context gooping with conversations.history)
+**Current Plan:** 03-01 (next)
+**Last Completed:** 02-03 (event handler wiring — resolveRoute + buildSubagentContext integrated)
 
 ## Key Decisions Log
 
@@ -45,6 +45,8 @@ See: .planning/PROJECT.md (updated 2026-03-27)
 | 2026-03-30 | Added types to types.ts in 02-02 (Rule 3 fix) | Wave 1 parallel: 02-01 not yet run; added HistoryMessage/SubagentContext/ChannelConfig to unblock context.ts |
 | 2026-03-30 | resolveRoute is a pure function | No I/O, no Slack client — fully testable, event handlers delegate to it |
 | 2026-03-30 | Zod schema for subagentConfigSchema | Validates channelConfig field; replaces unsafe JSON.parse cast in loadSubagentConfig |
+| 2026-03-30 | Stub dispatch pattern in Phase 2 handlers | [agentName] + history count echoed; Phase 3 replaces with real subagent execution |
+| 2026-03-30 | botUserId resolved at startup via WebClient.auth.test() | Avoids circular dep; WebClient used directly before Bolt app creation |
 
 ## Performance Metrics
 
@@ -55,7 +57,8 @@ See: .planning/PROJECT.md (updated 2026-03-27)
 
 | 02-01 | 2min | 2 | 5 |
 | 02-02 | 4min | 2 | 3 |
+| 02-03 | 2min | 2 | 7 |
 
 ---
 *Initialized: 2026-03-27*
-*Last session: 2026-03-30T02:18:48Z — Completed 02-01-PLAN.md*
+*Last session: 2026-03-30T02:24:40Z — Completed 02-03-PLAN.md*

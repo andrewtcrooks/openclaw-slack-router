@@ -30,8 +30,8 @@
 
 ### Channel Management
 
-- [ ] **CHAN-01**: Each project gets its own Slack channel (e.g., #rook-openclaw, #rook-datanova)
-- [ ] **CHAN-02**: Rook replies in-thread within a channel (keeps channel readable), but the context sent to the subagent is always the full channel history — not thread replies only
+- [x] **CHAN-01**: Each project gets its own Slack channel (e.g., #rook-openclaw, #rook-datanova)
+- [x] **CHAN-02**: Rook replies in-thread within a channel (keeps channel readable), but the context sent to the subagent is always the full channel history — not thread replies only
 
 ### Subagent Interface
 
@@ -90,8 +90,8 @@
 | CTX-02 | Phase 2 | Complete |
 | CTX-03 | Phase 2 | Complete |
 | CTX-04 | Phase 2 | Complete |
-| CHAN-01 | Phase 2 | Pending |
-| CHAN-02 | Phase 2 | Pending |
+| CHAN-01 | Phase 2 | Complete |
+| CHAN-02 | Phase 2 | Complete |
 | AGENT-01 | Phase 3 | Pending |
 | AGENT-02 | Phase 3 | Pending |
 | AGENT-03 | Phase 3 | Pending |
