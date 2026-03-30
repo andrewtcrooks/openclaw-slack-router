@@ -16,10 +16,10 @@
 
 ### Routing
 
-- [ ] **ROUTE-01**: Each incoming message is dispatched to a specific named subagent
-- [ ] **ROUTE-02**: Users can explicitly select a subagent via slash command or message prefix
-- [ ] **ROUTE-03**: Routing configuration maps identifiers to subagent definitions
-- [ ] **ROUTE-04**: Unknown/unmatched messages fall back to a default subagent
+- [x] **ROUTE-01**: Each incoming message is dispatched to a specific named subagent
+- [x] **ROUTE-02**: Users can explicitly select a subagent via slash command or message prefix
+- [x] **ROUTE-03**: Routing configuration maps identifiers to subagent definitions
+- [x] **ROUTE-04**: Unknown/unmatched messages fall back to a default subagent
 
 ### Context Management
 
@@ -82,10 +82,10 @@
 | SLACK-06 | Phase 1 | Complete |
 | CFG-01 | Phase 1 | Complete |
 | CFG-02 | Phase 1 | Complete |
-| ROUTE-01 | Phase 2 | Pending |
-| ROUTE-02 | Phase 2 | Pending |
-| ROUTE-03 | Phase 2 | Pending |
-| ROUTE-04 | Phase 2 | Pending |
+| ROUTE-01 | Phase 2 | Complete |
+| ROUTE-02 | Phase 2 | Complete |
+| ROUTE-03 | Phase 2 | Complete |
+| ROUTE-04 | Phase 2 | Complete |
 | CTX-01 | Phase 2 | Complete |
 | CTX-02 | Phase 2 | Complete |
 | CTX-03 | Phase 2 | Complete |
