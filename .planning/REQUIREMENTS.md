@@ -23,10 +23,10 @@
 
 ### Context Management
 
-- [ ] **CTX-01**: Full channel history is fetched via `conversations.history` before every subagent call
-- [ ] **CTX-02**: Channel history is formatted as `{role, content}[]` and included as conversation context in the subagent call
-- [ ] **CTX-03**: Each Slack channel is an isolated context — history from one channel never appears in another channel's calls
-- [ ] **CTX-04**: History fetch limit is configurable per channel (maps to `historyLimit` in config)
+- [x] **CTX-01**: Full channel history is fetched via `conversations.history` before every subagent call
+- [x] **CTX-02**: Channel history is formatted as `{role, content}[]` and included as conversation context in the subagent call
+- [x] **CTX-03**: Each Slack channel is an isolated context — history from one channel never appears in another channel's calls
+- [x] **CTX-04**: History fetch limit is configurable per channel (maps to `historyLimit` in config)
 
 ### Channel Management
 
@@ -86,10 +86,10 @@
 | ROUTE-02 | Phase 2 | Pending |
 | ROUTE-03 | Phase 2 | Pending |
 | ROUTE-04 | Phase 2 | Pending |
-| CTX-01 | Phase 2 | Pending |
-| CTX-02 | Phase 2 | Pending |
-| CTX-03 | Phase 2 | Pending |
-| CTX-04 | Phase 2 | Pending |
+| CTX-01 | Phase 2 | Complete |
+| CTX-02 | Phase 2 | Complete |
+| CTX-03 | Phase 2 | Complete |
+| CTX-04 | Phase 2 | Complete |
 | CHAN-01 | Phase 2 | Pending |
 | CHAN-02 | Phase 2 | Pending |
 | AGENT-01 | Phase 3 | Pending |
