@@ -59,11 +59,11 @@ Plans:
 
 **Requirements:** AGENT-01, AGENT-02, AGENT-03
 
-**Plans:** 1/2 plans complete
+**Plans:** 2/2 plans complete
 
 Plans:
 - [x] 03-01-PLAN.md — SubagentDefinition interface, threadHistory rename, registry skeleton, event handler wiring
-- [ ] 03-02-PLAN.md — Gateway chat client (WebSocket), openclaw-gateway subagent, registry registration
+- [x] 03-02-PLAN.md — Gateway chat client (WebSocket), openclaw-gateway subagent, registry registration
 
 **Success Criteria:**
 1. `SubagentDefinition` interface is exported from a shared types file with `name`, `description`, `handle(ctx: SubagentContext): Promise<string>` shape

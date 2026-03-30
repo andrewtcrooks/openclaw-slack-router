@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-current_plan: Plan 1 of 2 in Phase 3
-status: in-progress
-last_updated: "2026-03-30T18:37:00Z"
+current_plan: Plan 2 of 2 in Phase 3
+status: complete
+last_updated: "2026-03-30T18:46:00Z"
 progress:
   total_phases: 3
-  completed_phases: 2
+  completed_phases: 3
   total_plans: 7
-  completed_plans: 6
+  completed_plans: 7
 ---
 
 # Project State: openclaw-slack-router
@@ -25,10 +25,10 @@ See: .planning/PROJECT.md (updated 2026-03-27)
 
 - Phase 1: ● Complete (Plan 01 + Plan 02 done)
 - Phase 2: ● Complete (Plans 01 + 02 + 03 done)
-- Phase 3: ◐ In progress (Plan 01 done, Plan 02 pending)
+- Phase 3: ● Complete (Plan 01 + Plan 02 done)
 
-**Current Plan:** Plan 1 of 2 in Phase 3
-**Last Completed:** 03-01 (subagent interface + registry — SubagentDefinition, registry dispatch, threadHistory rename)
+**Current Plan:** Plan 2 of 2 in Phase 3
+**Last Completed:** 03-02 (openclaw-gateway subagent — gatewayChatSend, default registry, end-to-end dispatch)
 
 ## Key Decisions Log
 
@@ -50,6 +50,9 @@ See: .planning/PROJECT.md (updated 2026-03-27)
 | 2026-03-30 | SubagentDefinition.handle returns Promise<string> | Simple text response contract; subagents return plain string |
 | 2026-03-30 | Registry miss returns user message, not exception | Graceful degradation when agent in config but not in registry |
 | 2026-03-30 | OPENCLAW_GATEWAY_URL defaults to ws://127.0.0.1:18789 | Local dev default for WebSocket gateway |
+| 2026-03-30 | connect-per-request pattern for gateway WebSocket | Simpler than persistent connection for Phase 3 |
+| 2026-03-30 | Gateway errors caught and returned as user-friendly strings | Subagent.handle() never throws; returns [error] string |
+| 2026-03-30 | OPENCLAW_GATEWAY_TOKEN read from env directly, not zod schema | Optional with no prefix requirement; simpler |
 
 ## Performance Metrics
 
@@ -63,7 +66,8 @@ See: .planning/PROJECT.md (updated 2026-03-27)
 | 02-03 | 2min | 2 | 7 |
 
 | 03-01 | 4min | 2 | 14 |
+| 03-02 | 4min | 2 | 7 |
 
 ---
 *Initialized: 2026-03-27*
-*Last session: 2026-03-30T18:37:00Z — Completed 03-01-PLAN.md*
+*Last session: 2026-03-30T18:46:00Z — Completed 03-02-PLAN.md*
