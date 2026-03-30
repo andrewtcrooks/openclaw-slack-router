@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
+import type { SubagentConfig } from "./types.js";
 
 // Track constructor calls and event registrations
 const mockEventFn = vi.fn();
@@ -23,12 +24,18 @@ describe("createApp", () => {
     mockEventFn.mockClear();
   });
 
+  const config = {
+    SLACK_BOT_TOKEN: "xoxb-test",
+    SLACK_APP_TOKEN: "xapp-test",
+  };
+  const subagentConfig: SubagentConfig = {
+    defaultAgent: "echo",
+    agents: { echo: { name: "echo", description: "Echo agent" } },
+  };
+  const botUserId = "UBOT1";
+
   it("creates App with socketMode: true", () => {
-    const config = {
-      SLACK_BOT_TOKEN: "xoxb-test",
-      SLACK_APP_TOKEN: "xapp-test",
-    };
-    createApp(config);
+    createApp(config, subagentConfig, botUserId);
     expect(mockConstructor).toHaveBeenCalledWith({
       token: "xoxb-test",
       appToken: "xapp-test",
@@ -37,11 +44,7 @@ describe("createApp", () => {
   });
 
   it("registers app_mention event handler", () => {
-    const config = {
-      SLACK_BOT_TOKEN: "xoxb-test",
-      SLACK_APP_TOKEN: "xapp-test",
-    };
-    createApp(config);
+    createApp(config, subagentConfig, botUserId);
     const eventCalls = mockEventFn.mock.calls.map(
       (call: unknown[]) => call[0],
     );
@@ -49,11 +52,7 @@ describe("createApp", () => {
   });
 
   it("registers message event handler", () => {
-    const config = {
-      SLACK_BOT_TOKEN: "xoxb-test",
-      SLACK_APP_TOKEN: "xapp-test",
-    };
-    createApp(config);
+    createApp(config, subagentConfig, botUserId);
     const eventCalls = mockEventFn.mock.calls.map(
       (call: unknown[]) => call[0],
     );

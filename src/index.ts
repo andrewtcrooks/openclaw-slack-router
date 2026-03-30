@@ -1,12 +1,33 @@
 import "dotenv/config";
-import { loadConfig } from "./config.js";
+import { loadConfig, loadSubagentConfig } from "./config.js";
 import { createApp } from "./app.js";
 
 async function main() {
   const config = loadConfig();
-  const app = createApp(config);
+  const subagentConfig = loadSubagentConfig();
+
+  // Resolve bot's own user ID once at startup for assistant message tagging.
+  // Uses WebClient directly (before creating the Bolt app) since createApp needs botUserId.
+  const SlackBolt = await import("@slack/bolt");
+  const slackBoltModule = SlackBolt as typeof import("@slack/bolt") & {
+    default?: typeof import("@slack/bolt");
+  };
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const slackBolt =
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    ((slackBoltModule as any).App
+      ? slackBoltModule
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      : (slackBoltModule as any).default) ?? slackBoltModule;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { WebClient } = slackBolt as any;
+  const client = new WebClient(config.SLACK_BOT_TOKEN);
+  const authResult = await client.auth.test();
+  const botUserId = authResult.user_id as string;
+
+  const app = createApp(config, subagentConfig, botUserId);
   await app.start();
-  console.log("Rook is running in Socket Mode");
+  console.log(`Rook is running in Socket Mode (bot user: ${botUserId})`);
 }
 
 main().catch((err) => {
