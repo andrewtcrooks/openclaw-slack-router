@@ -23,7 +23,7 @@ export async function buildSubagentContext(params: {
 
   // CTX-04: per-channel historyLimit, default 50
   const historyLimit =
-    config.channelConfig?.[channelId]?.historyLimit ?? 50;
+    config.channels?.[channelId]?.historyLimit ?? 50;
 
   // CTX-01: fetch channel history (channel-scoped, not thread-scoped)
   const result = await client.conversations.history({

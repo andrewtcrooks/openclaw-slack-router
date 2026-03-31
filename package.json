@@ -1,17 +1,32 @@
 {
   "name": "openclaw-slack-router",
   "version": "0.1.0",
-  "private": true,
+  "description": "Slack router plugin for openclaw — connect your agent to Slack with per-channel context isolation",
   "type": "module",
+  "bin": {
+    "openclaw-slack-router": "./dist/cli.js"
+  },
+  "main": "./dist/index.js",
+  "exports": {
+    ".": "./dist/index.js"
+  },
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "dev": "tsx watch src/index.ts",
     "build": "tsc",
     "start": "node dist/index.js",
     "typecheck": "tsc --noEmit",
-    "test": "vitest run --reporter=verbose"
+    "test": "vitest run --reporter=verbose",
+    "prepublishOnly": "npm run build"
   },
+  "keywords": ["openclaw", "slack", "agent", "router", "bot"],
+  "license": "MIT",
   "dependencies": {
+    "@inquirer/prompts": "^8.3.2",
     "@slack/bolt": "^4.6.0",
+    "commander": "^14.0.3",
     "dotenv": "^16.5.0",
     "ws": "^8.20.0",
     "zod": "^3.24.0"

@@ -12,8 +12,12 @@ describe("registerMessageHandler", () => {
   }) => Promise<void>;
 
   const config: SubagentConfig = {
+    botName: "TestBot",
+    mainChannelId: null,
+    introPosted: false,
     defaultAgent: "echo",
     agents: { echo: { name: "echo", description: "Echo agent" } },
+    channels: {},
   };
   const botUserId = "UBOT1";
 
@@ -62,11 +66,15 @@ describe("registerMessageHandler", () => {
 
   it("routes DM via slash prefix to named agent", async () => {
     const localConfig: SubagentConfig = {
+      botName: "TestBot",
+      mainChannelId: null,
+      introPosted: false,
       defaultAgent: "echo",
       agents: {
         echo: { name: "echo", description: "Echo agent" },
         research: { name: "research", description: "Research agent" },
       },
+      channels: {},
     };
     const localRegistry: SubagentRegistry = {
       ...mockRegistry,
@@ -222,10 +230,14 @@ describe("registerMessageHandler", () => {
 
   it("replies with 'No subagent implementation registered' when agent in config but not in registry", async () => {
     const localConfig: SubagentConfig = {
+      botName: "TestBot",
+      mainChannelId: null,
+      introPosted: false,
       defaultAgent: "ghost",
       agents: {
         ghost: { name: "ghost", description: "Ghost agent" },
       },
+      channels: {},
     };
     const emptyRegistry: SubagentRegistry = {};
     mockApp = { event: vi.fn() };

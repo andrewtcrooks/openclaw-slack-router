@@ -3,7 +3,8 @@ export interface SubagentEntry {
   description: string;
 }
 
-export interface ChannelConfig {
+export interface ChannelEntry {
+  name: string;
   historyLimit?: number;
 }
 
@@ -22,7 +23,10 @@ export interface SubagentContext {
 }
 
 export interface SubagentConfig {
+  botName: string;
+  mainChannelId: string | null;
+  introPosted: boolean;
   defaultAgent: string;
   agents: Record<string, SubagentEntry>;
-  channelConfig?: Record<string, ChannelConfig>;
+  channels: Record<string, ChannelEntry>;
 }

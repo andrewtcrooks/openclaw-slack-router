@@ -2,6 +2,7 @@ import "dotenv/config";
 import { loadConfig, loadSubagentConfig } from "./config.js";
 import { createApp } from "./app.js";
 import { buildSubagentRegistry } from "./subagents/index.js";
+import { postIntroIfNeeded } from "./admin.js";
 
 async function main() {
   const config = loadConfig();
@@ -32,7 +33,10 @@ async function main() {
 
   const app = createApp(config, subagentConfig, botUserId, subagentRegistry);
   await app.start();
-  console.log(`Rook is running in Socket Mode (bot user: ${botUserId})`);
+  console.log(`${subagentConfig.botName} is running in Socket Mode (bot user: ${botUserId})`);
+
+  // Post intro message in main channel on first start
+  await postIntroIfNeeded({ client, config: subagentConfig });
 }
 
 main().catch((err) => {

@@ -1,6 +1,7 @@
 import { resolveThreadTs } from "../handlers/reply.js";
 import { resolveRoute, UnknownAgentError } from "../router.js";
 import { buildSubagentContext } from "../context.js";
+import { handleAdminCommand } from "../admin.js";
 import type { SubagentConfig } from "../types.js";
 import type { SubagentRegistry } from "../subagents/index.js";
 
@@ -25,6 +26,25 @@ export function registerAppMentionHandler(
 
     // SLACK-03: Reply in thread
     const threadTs = resolveThreadTs(event);
+
+    // Strip bot mention from text for command parsing
+    const rawText: string = event.text ?? "";
+    const MENTION_RE = /^<@[A-Z0-9]+>\s*/;
+    const textWithoutMention = rawText.replace(MENTION_RE, "").trim();
+
+    // Admin commands: handle in main channel (and any channel for convenience)
+    if (config.mainChannelId && event.channel === config.mainChannelId) {
+      const adminResponse = await handleAdminCommand({
+        text: textWithoutMention,
+        client,
+        threadTs,
+        config,
+      });
+      if (adminResponse !== null) {
+        await say({ text: adminResponse, thread_ts: threadTs });
+        return;
+      }
+    }
 
     try {
       const route = resolveRoute(event.text, botUserId, config);

@@ -52,8 +52,10 @@ describe("loadConfig", () => {
 describe("loadSubagentConfig", () => {
   it("loads subagent config from file", () => {
     const config = loadSubagentConfig();
-    expect(config.defaultAgent).toBe("echo");
-    expect(config.agents.echo).toBeDefined();
-    expect(config.agents.echo.name).toBe("echo");
+    expect(config.defaultAgent).toBe("default");
+    expect(config.agents.default).toBeDefined();
+    expect(config.agents.default.name).toBe("openclaw-gateway");
+    expect(config.botName).toBeDefined();
+    expect(config.channels).toBeDefined();
   });
 });

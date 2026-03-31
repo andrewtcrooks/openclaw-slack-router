@@ -3,11 +3,15 @@ import { resolveRoute, UnknownAgentError } from "./router.js";
 import type { SubagentConfig } from "./types.js";
 
 const config: SubagentConfig = {
+  botName: "TestBot",
+  mainChannelId: null,
+  introPosted: false,
   defaultAgent: "echo",
   agents: {
     echo: { name: "echo", description: "Echo agent" },
     research: { name: "research", description: "Research agent" },
   },
+  channels: {},
 };
 
 const BOT_ID = "UBOT123";

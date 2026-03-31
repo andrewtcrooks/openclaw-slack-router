@@ -30,8 +30,12 @@ describe("createApp", () => {
     SLACK_APP_TOKEN: "xapp-test",
   };
   const subagentConfig: SubagentConfig = {
+    botName: "TestBot",
+    mainChannelId: null,
+    introPosted: false,
     defaultAgent: "echo",
     agents: { echo: { name: "echo", description: "Echo agent" } },
+    channels: {},
   };
   const botUserId = "UBOT1";
   const registry: SubagentRegistry = {};

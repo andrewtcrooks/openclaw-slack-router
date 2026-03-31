@@ -1,146 +1,181 @@
 # openclaw-slack-router
 
-Rook is a Slack bot that receives messages in Socket Mode and routes them to subagents. Each Slack channel is an isolated project context — `#rook-openclaw` only sees openclaw history, `#rook-datanova` only sees datanova history.
+A Slack router plugin for [openclaw](https://github.com/andrewtcrooks/openclaw). Connect your openclaw agent to Slack with per-channel context isolation — each channel is an independent project context, managed entirely through chat.
 
 ## How it works
 
-1. Someone mentions `@Rook` in a channel (or sends a DM)
-2. Rook fetches full channel history via `conversations.history`
-3. The message is routed to the appropriate subagent
-4. The subagent receives the message + full channel history as context
-5. The response is posted back in-thread
+1. Run `npx openclaw-slack-router init` to configure credentials and create your main channel
+2. Start the bot — it joins your main channel and posts setup instructions
+3. Say `new channel my-project` in the main channel to create a project channel
+4. Mention the bot in any project channel — it routes your message to openclaw and replies in-thread
+5. Each channel maintains its own context — `#project-a` and `#project-b` never bleed into each other
 
-## Setup
+## Install
+
+```
+npm install openclaw-slack-router
+```
+
+Or run without installing:
+
+```
+npx openclaw-slack-router init
+```
+
+## Quick start
 
 ### 1. Create a Slack app
 
 In the [Slack app console](https://api.slack.com/apps):
 
-- Enable **Socket Mode** and generate an App Token (`xapp-...`)
-- Add a Bot Token (`xoxb-...`) under OAuth & Permissions
-- Required OAuth scopes: `app_mentions:read`, `chat:write`, `channels:history`, `channels:join`, `groups:history`, `im:history`, `im:write`
-- Subscribe to bot events: `app_mention`, `message.im`
+- **Enable Socket Mode** — generate an App Token (`xapp-...`) under Settings → Basic Information
+- **Add a Bot Token** (`xoxb-...`) under OAuth & Permissions → Install to Workspace
+- **Required OAuth scopes:** `app_mentions:read`, `chat:write`, `channels:history`, `channels:join`, `channels:manage`, `groups:history`, `im:history`, `im:write`
+- **Subscribe to bot events:** `app_mention`, `message.im`
 
-### 2. Install dependencies
-
-```
-npm install
-```
-
-### 3. Configure environment
-
-Create a `.env` file:
+### 2. Run the setup wizard
 
 ```
-SLACK_BOT_TOKEN=xoxb-...
-SLACK_APP_TOKEN=xapp-...
-
-# Optional: openclaw gateway (defaults to ws://127.0.0.1:18789)
-OPENCLAW_GATEWAY_URL=ws://127.0.0.1:18789
-OPENCLAW_GATEWAY_TOKEN=your-token-here
+npx openclaw-slack-router init
 ```
 
-### 4. Configure routing
+The wizard asks for your tokens, gateway URL, and a name for your main channel. It writes `.env` and `openclaw-slack-router.config.json`.
 
-Edit `subagent-config.json`:
+### 3. Invite the bot to your main channel
+
+Create the channel you named during setup, then invite your bot user to it. Copy the channel ID (right-click the channel → View channel details → copy the ID starting with `C...`), then add it to `openclaw-slack-router.config.json`:
 
 ```json
 {
-  "defaultAgent": "openclaw-gateway",
+  "mainChannelId": "CXXXXXXXXX"
+}
+```
+
+### 4. Start
+
+```
+npx openclaw-slack-router start
+```
+
+Or if installed locally:
+
+```
+npm start
+```
+
+On first start, the bot posts a welcome message in your main channel with instructions for creating project channels.
+
+## Managing channels via chat
+
+Everything is done by talking to the bot in your main channel:
+
+| Say this | What happens |
+|----------|-------------|
+| `new channel my-project` | Creates `#my-project` in Slack, joins it, registers it for routing |
+| `list channels` | Shows all registered project channels |
+| `remove channel my-project` | Unregisters the channel (Slack channel still exists) |
+| `help` | Shows available commands |
+
+## Routing messages
+
+In any project channel, mention the bot:
+
+```
+@YourBot what's the status of the API migration?
+```
+
+To route to a specific agent explicitly:
+
+```
+@YourBot /research find recent papers on RAG architectures
+@YourBot research: find recent papers on RAG architectures
+```
+
+If no agent prefix is given, the message goes to the default agent (openclaw-gateway).
+
+## Configuration
+
+`openclaw-slack-router.config.json` is created by `init` and managed by the bot. You can also edit it directly:
+
+```json
+{
+  "botName": "Rook",
+  "mainChannelId": "CXXXXXXXXX",
+  "introPosted": false,
+  "defaultAgent": "default",
   "agents": {
-    "openclaw-gateway": {
+    "default": {
       "name": "openclaw-gateway",
       "description": "Routes messages through the local openclaw gateway"
     }
   },
-  "channelConfig": {
+  "channels": {
     "C1234567890": {
+      "name": "my-project",
       "historyLimit": 50
     }
   }
 }
 ```
 
-- `defaultAgent` — which agent handles unrouted messages
-- `agents` — registered agent names (must match a registered `SubagentDefinition`)
-- `channelConfig` — per-channel overrides keyed by Slack channel ID; `historyLimit` controls how many messages are fetched for context (default: Slack API default)
+| Field | Description |
+|-------|-------------|
+| `botName` | Display name used in logs and error messages |
+| `mainChannelId` | Channel ID of your admin/control channel |
+| `introPosted` | Set to `true` after the bot posts its first intro — prevents re-posting on restart |
+| `defaultAgent` | Which agent handles unrouted messages |
+| `agents` | Registered agent names and descriptions |
+| `channels` | Active project channels; `historyLimit` controls how many messages are fetched for context |
 
-### 5. Run
+**This file is gitignored** — your channel config and tokens stay local.
 
-```
-# Development (watch mode)
-npm run dev
+## Environment variables
 
-# Production
-npm run build
-npm start
-```
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `SLACK_BOT_TOKEN` | Yes | Bot OAuth token (`xoxb-...`) |
+| `SLACK_APP_TOKEN` | Yes | Socket Mode app token (`xapp-...`) |
+| `OPENCLAW_GATEWAY_URL` | No | Gateway WebSocket URL (default: `ws://127.0.0.1:18789`) |
+| `OPENCLAW_GATEWAY_TOKEN` | No | Gateway auth token if your gateway requires one |
 
-## Usage in Slack
+## Channel context model
 
-**Route to default agent** (implicit):
-```
-@Rook what's the status of the permit scraper?
-```
+Each Slack channel is an isolated project context:
 
-**Route to a specific agent** (slash prefix):
-```
-@Rook /research find me information about X
-```
+- `#project-openclaw` only sees openclaw conversation history
+- `#project-datanova` only sees datanova history
+- No cross-project token burn, no context bleed
 
-**Route to a specific agent** (colon prefix):
-```
-@Rook research: find me information about X
-```
+Context is built from **full channel history** (`conversations.history`), not individual thread replies. Threads are for sub-discussions — the context sent to openclaw is always the whole channel.
 
-If you request an unknown agent, Rook replies with an error listing the available agents.
-
-## Channel model
-
-Each Slack channel maps to one isolated project context:
-
-- `#rook-openclaw` → openclaw context only
-- `#rook-datanova` → datanova context only
-
-Context is built from **channel history** (`conversations.history`), not thread replies. Threads inside a channel are lightweight sub-discussions — Rook replies in-thread for readability, but the context sent to the subagent is always the full channel history.
-
-## Adding a subagent
+## Adding a custom subagent
 
 Implement the `SubagentDefinition` interface:
 
 ```typescript
-import type { SubagentDefinition, SubagentContext } from "./src/subagents/types.js";
+import type { SubagentDefinition, SubagentContext } from "openclaw-slack-router";
 
-const mySubagent: SubagentDefinition = {
+const myAgent: SubagentDefinition = {
   name: "my-agent",
   description: "Does something useful",
   async handle(ctx: SubagentContext): Promise<string> {
-    // ctx.currentMessage — the current message text
-    // ctx.threadHistory  — [{role, content}] channel history
-    // ctx.channelId      — Slack channel ID
-    // ctx.userId         — Slack user ID
-    // ctx.threadTs       — thread timestamp to reply into
+    // ctx.currentMessage  — the current message text
+    // ctx.threadHistory   — [{role, content}] full channel history
+    // ctx.channelId       — Slack channel ID
+    // ctx.userId          — Slack user ID who sent the message
+    // ctx.threadTs        — thread timestamp to reply into
     return "response text";
   },
 };
 ```
 
-Then register it in `src/subagents/index.ts` alongside `openclaw-gateway`.
-
-## The openclaw-gateway subagent
-
-The built-in subagent connects to a local openclaw gateway over WebSocket. The gateway protocol:
-
-1. Receives a `connect.challenge` event
-2. Sends `connect` request (with optional auth token)
-3. Sends `chat.send` with `{ sessionKey, message, idempotencyKey }`
-4. Streams `chat` events until `state: "final"` or `state: "error"`
-
-The `sessionKey` is the Slack channel ID, so each channel maintains a separate conversation session in the gateway.
+Register it in `src/subagents/index.ts` alongside `openclaw-gateway`.
 
 ## Development
 
 ```
+npm run dev       # watch mode with tsx
 npm test          # run tests
 npm run typecheck # type check without emitting
+npm run build     # compile to dist/
 ```

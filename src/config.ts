@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { readFileSync } from "node:fs";
+import { readFileSync, writeFileSync } from "node:fs";
 import type { SubagentConfig } from "./types.js";
 
 const envSchema = z.object({
@@ -20,7 +20,8 @@ export function loadConfig(): AppConfig {
   return result.data;
 }
 
-const channelConfigSchema = z.object({
+const channelEntrySchema = z.object({
+  name: z.string(),
   historyLimit: z.number().int().positive().optional(),
 });
 
@@ -30,14 +31,26 @@ const subagentEntrySchema = z.object({
 });
 
 const subagentConfigSchema = z.object({
+  botName: z.string().default("Rook"),
+  mainChannelId: z.string().nullable().default(null),
+  introPosted: z.boolean().default(false),
   defaultAgent: z.string(),
   agents: z.record(subagentEntrySchema),
-  channelConfig: z.record(channelConfigSchema).optional(),
+  channels: z.record(channelEntrySchema).default({}),
 });
 
+export const DEFAULT_CONFIG_PATH = "./openclaw-slack-router.config.json";
+
 export function loadSubagentConfig(
-  path = "./subagent-config.json",
+  path = DEFAULT_CONFIG_PATH,
 ): SubagentConfig {
   const raw = readFileSync(path, "utf-8");
   return subagentConfigSchema.parse(JSON.parse(raw));
+}
+
+export function saveSubagentConfig(
+  config: SubagentConfig,
+  path = DEFAULT_CONFIG_PATH,
+): void {
+  writeFileSync(path, JSON.stringify(config, null, 2) + "\n", "utf-8");
 }

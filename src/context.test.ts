@@ -3,8 +3,12 @@ import { buildSubagentContext } from "./context.js";
 import type { SubagentConfig } from "./types.js";
 
 const config: SubagentConfig = {
+  botName: "TestBot",
+  mainChannelId: null,
+  introPosted: false,
   defaultAgent: "echo",
   agents: { echo: { name: "echo", description: "Echo" } },
+  channels: {},
 };
 
 const BOT_USER_ID = "UBOT123";
@@ -37,11 +41,11 @@ describe("buildSubagentContext", () => {
     });
   });
 
-  it("calls conversations.history with per-channel historyLimit from config.channelConfig", async () => {
+  it("calls conversations.history with per-channel historyLimit from config.channels", async () => {
     const client = makeClient([]);
     const configWithLimit: SubagentConfig = {
       ...config,
-      channelConfig: { C123: { historyLimit: 25 } },
+      channels: { C123: { name: "test-channel", historyLimit: 25 } },
     };
     await buildSubagentContext({ ...baseParams, client, config: configWithLimit });
     expect(client.conversations.history).toHaveBeenCalledWith({
