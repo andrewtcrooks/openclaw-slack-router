@@ -184,3 +184,41 @@ npm run typecheck # type check without emitting
 npm run build     # compile to dist/
 ```
 
+## Publishing to npm (maintainers)
+
+### 1. Create a Granular Access Token on npmjs.com
+
+Go to [npmjs.com](https://www.npmjs.com) → your avatar → **Access Tokens** → **Generate New Token** → **Granular Access Token**.
+
+Fill in the form:
+
+| Field | Value |
+|-------|-------|
+| **Token name** | `GitHub Actions` |
+| **Description** | Automated publishing via GitHub Actions |
+| **Expiration** | Choose a date (npm requires one — 1 year is fine) |
+
+Under **Packages and scopes → Permissions**, set it to **Read and write**. This is what allows the token to publish. Then under **Select packages**, choose **Only select packages and scopes** and add `@datanovallc/openclaw-slack-router` (or select the entire `@datanovallc` scope).
+
+Leave **Organizations → Permissions** at no access — publishing doesn't need org-level permissions.
+
+Click **Generate token** and copy it immediately (it's only shown once).
+
+### 2. Add the token to GitHub
+
+In the GitHub repo → **Settings** → **Secrets and variables** → **Actions** → **New repository secret**:
+
+- Name: `NPM_TOKEN`
+- Value: the token you just copied
+
+### 3. Release a version
+
+```bash
+# bump version
+npm version patch   # or minor / major
+
+git push origin master --tags
+```
+
+The tag push triggers the GitHub Actions workflow (`.github/workflows/publish.yml`) and publishes to npm automatically. The `--access public` flag is required for scoped packages (`@datanovallc/...`) on the free npm plan.
+
