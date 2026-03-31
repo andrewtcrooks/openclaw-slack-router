@@ -186,25 +186,25 @@ npm run build     # compile to dist/
 
 ## Publishing to npm (maintainers)
 
-### 1. Create an Automation token on npmjs.com
+Trusted Publishing is configured — no token or secrets required.
 
-Go to [npmjs.com](https://www.npmjs.com) → your avatar → **Access Tokens** → **Generate New Token** → **Automation**.
-
-Give it a name (e.g. `GitHub Actions`). Automation tokens are designed for CI/CD — they skip 2FA by design without any insecure bypass checkbox.
-
-### 2. Add the token to GitHub
-
-In the GitHub repo → **Settings** → **Secrets and variables** → **Actions** → **New repository secret**:
-
-- Name: `NPM_TOKEN`
-- Value: the token you just copied
-
-### 3. Release a version
+### Release via GitHub (recommended)
 
 ```bash
 npm version patch   # or minor / major
-git push origin master --tags
+git push origin master
 ```
 
-The tag push triggers `.github/workflows/publish.yml` and publishes to npm automatically. The `--provenance` flag attaches a signed build attestation linking the package to this exact commit and workflow run.
+Then create a GitHub Release for that commit. Publishing the release triggers `.github/workflows/publish.yml` automatically via OIDC.
+
+### Release from your laptop
+
+Only needed to bypass CI. Bump the version first, then:
+
+```bash
+npm version patch
+npm publish
+```
+
+(`--access public` was only required for the initial publish of a scoped package — not needed for subsequent versions.)
 

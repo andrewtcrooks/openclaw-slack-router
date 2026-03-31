@@ -1,9 +1,8 @@
 name: Publish
 
 on:
-  push:
-    tags:
-      - "v*"
+  release:
+    types: [published]
 
 jobs:
   publish:
@@ -18,6 +17,4 @@ jobs:
           node-version: 20
           registry-url: https://registry.npmjs.org
       - run: npm ci
-      - run: npm publish --access public --provenance
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - run: npm publish --provenance
