@@ -186,36 +186,18 @@ npm run build     # compile to dist/
 
 ## Publishing to npm (maintainers)
 
-This repo uses **npm Trusted Publishing** — no stored secret token required. GitHub Actions authenticates via OIDC, so npm never sees a long-lived credential.
+### 1. Create an Automation token on npmjs.com
 
-### 1. Configure Trusted Publishing on npmjs.com
+Go to [npmjs.com](https://www.npmjs.com) → your avatar → **Access Tokens** → **Generate New Token** → **Automation**.
 
-Do this once after the package is first published manually.
+Give it a name (e.g. `GitHub Actions`). Automation tokens are designed for CI/CD — they skip 2FA by design without any insecure bypass checkbox.
 
-Go to [npmjs.com](https://www.npmjs.com) → **your package** → **Settings** → **Publishing** → **Add a Publisher**.
+### 2. Add the token to GitHub
 
-Fill in:
+In the GitHub repo → **Settings** → **Secrets and variables** → **Actions** → **New repository secret**:
 
-| Field | Value |
-|-------|-------|
-| **Publisher** | GitHub Actions |
-| **Owner** | `andrewtcrooks` |
-| **Repository** | `openclaw-slack-router` |
-| **Workflow filename** | `publish.yml` |
-| **Environment** | *(leave blank)* |
-
-Save. That's it — no token to generate, no secret to store in GitHub.
-
-### 2. First publish (manual, one-time)
-
-The package must exist on npm before Trusted Publishing can be configured. Run once from your local machine:
-
-```bash
-npm run build
-npm publish --access public
-```
-
-This will prompt for your npm credentials and 2FA. After this, all future releases go through GitHub Actions.
+- Name: `NPM_TOKEN`
+- Value: the token you just copied
 
 ### 3. Release a version
 
@@ -224,5 +206,5 @@ npm version patch   # or minor / major
 git push origin master --tags
 ```
 
-The tag push triggers `.github/workflows/publish.yml`, which uses OIDC to authenticate with npm and publishes automatically — no token, no 2FA prompt.
+The tag push triggers `.github/workflows/publish.yml` and publishes to npm automatically. The `--provenance` flag attaches a signed build attestation linking the package to this exact commit and workflow run.
 
