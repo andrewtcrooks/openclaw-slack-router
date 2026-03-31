@@ -4,22 +4,24 @@ A Slack router plugin for [openclaw](https://github.com/andrewtcrooks/openclaw).
 
 ## How it works
 
-1. Run `npx openclaw-slack-router init` to configure credentials and create your main channel
-2. Start the bot — it joins your main channel and posts setup instructions
-3. Say `new channel my-project` in the main channel to create a project channel
-4. Mention the bot in any project channel — it routes your message to openclaw and replies in-thread
-5. Each channel maintains its own context — `#project-a` and `#project-b` never bleed into each other
+1. Install via openclaw's plugin system
+2. Configure your Slack tokens (`openclaw config set ...` or `openclaw slack setup`)
+3. Start openclaw — the Slack bot starts automatically as a service
+4. Your main channel posts setup instructions on first start
+5. Say `new channel my-project` in the main channel to create a project channel
+6. Mention the bot in any project channel — it routes your message to openclaw and replies in-thread
+7. Each channel maintains its own context — `#project-a` and `#project-b` never bleed into each other
 
 ## Install
 
 ```
-npm install openclaw-slack-router
+openclaw plugins install npm:@datanovallc/openclaw-slack-router
 ```
 
-Or run without installing:
+Then restart your openclaw gateway:
 
 ```
-npx openclaw-slack-router init
+openclaw gateway restart
 ```
 
 ## Quick start
