@@ -1,10 +1,7 @@
 #!/usr/bin/env node
 import { Command } from "commander";
-import { createRequire } from "node:module";
 import { runInit } from "./commands/init.js";
-
-const require = createRequire(import.meta.url);
-const pkg = require("../package.json") as { version: string };
+import pkg from "../package.json" with { type: "json" };
 
 const program = new Command();
 

@@ -5,7 +5,7 @@ import type { SubagentRegistry } from "./subagents/index.js";
 import { registerAppMentionHandler } from "./events/app-mention.js";
 import { registerMessageHandler } from "./events/message.js";
 
-const slackBoltModule = SlackBolt as typeof import("@slack/bolt") & {
+const slackBoltModule = SlackBolt as unknown as typeof import("@slack/bolt") & {
   default?: typeof import("@slack/bolt");
 };
 const slackBolt =
