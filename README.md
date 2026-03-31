@@ -183,28 +183,3 @@ npm test          # run tests
 npm run typecheck # type check without emitting
 npm run build     # compile to dist/
 ```
-
-## Publishing to npm (maintainers)
-
-Trusted Publishing is configured — no token or secrets required.
-
-### Release via GitHub (recommended)
-
-```bash
-npm version patch   # or minor / major
-git push origin master
-```
-
-Then create a GitHub Release for that commit. Publishing the release triggers `.github/workflows/publish.yml` automatically via OIDC.
-
-### Release from your laptop
-
-Only needed to bypass CI. Bump the version first, then:
-
-```bash
-npm version patch
-npm publish
-```
-
-(`--access public` was only required for the initial publish of a scoped package — not needed for subsequent versions.)
-
