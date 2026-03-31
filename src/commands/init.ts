@@ -1,9 +1,46 @@
-import { input, password, confirm } from "@inquirer/prompts";
+import { input, password, confirm, select } from "@inquirer/prompts";
 import { writeFileSync, existsSync, readFileSync } from "node:fs";
+import { homedir } from "node:os";
+import path from "node:path";
 import { saveSubagentConfig, DEFAULT_CONFIG_PATH } from "../config.js";
 import type { SubagentConfig } from "../types.js";
 
-const ENV_PATH = ".env";
+const OPENCLAW_ENV_PATH = path.join(homedir(), ".openclaw", ".env");
+
+/** Parse a .env file into a key→value map (skips comments and blank lines). */
+function parseEnvFile(filePath: string): Record<string, string> {
+  if (!existsSync(filePath)) return {};
+  const lines = readFileSync(filePath, "utf-8").split("\n");
+  const result: Record<string, string> = {};
+  for (const line of lines) {
+    const trimmed = line.trim();
+    if (!trimmed || trimmed.startsWith("#")) continue;
+    const idx = trimmed.indexOf("=");
+    if (idx === -1) continue;
+    result[trimmed.slice(0, idx)] = trimmed.slice(idx + 1);
+  }
+  return result;
+}
+
+/** Append new KEY=VALUE pairs to ~/.openclaw/.env, skipping keys that already exist. */
+function appendToOpenclawEnv(pairs: Record<string, string>): void {
+  const existing = parseEnvFile(OPENCLAW_ENV_PATH);
+  const newLines = Object.entries(pairs)
+    .filter(([k]) => !existing[k])
+    .map(([k, v]) => `${k}=${v}`);
+
+  if (newLines.length === 0) return;
+
+  const current = existsSync(OPENCLAW_ENV_PATH)
+    ? readFileSync(OPENCLAW_ENV_PATH, "utf-8").trimEnd()
+    : "";
+  const separator = current ? "\n" : "";
+  writeFileSync(
+    OPENCLAW_ENV_PATH,
+    current + separator + "\n" + newLines.join("\n") + "\n",
+    "utf-8",
+  );
+}
 
 export async function runInit(): Promise<void> {
   console.log("\nopenclaw-slack-router setup\n");
@@ -20,24 +57,55 @@ export async function runInit(): Promise<void> {
   }
 
   // --- Slack credentials ---
-  console.log("\nSlack credentials (from https://api.slack.com/apps):");
+  const existingEnv = parseEnvFile(OPENCLAW_ENV_PATH);
+  const hasExistingTokens =
+    existingEnv["SLACK_BOT_TOKEN"]?.startsWith("xoxb-") &&
+    existingEnv["SLACK_APP_TOKEN"]?.startsWith("xapp-");
 
-  const botToken = await password({
-    message: "Bot token (xoxb-...):",
-    validate: (v) => v.startsWith("xoxb-") || "Must start with xoxb-",
-  });
+  let botToken: string;
+  let appToken: string;
 
-  const appToken = await password({
-    message: "App token for Socket Mode (xapp-...):",
-    validate: (v) => v.startsWith("xapp-") || "Must start with xapp-",
-  });
+  if (hasExistingTokens) {
+    console.log(`\nFound existing Slack tokens in ${OPENCLAW_ENV_PATH}`);
+    const tokenSource = await select({
+      message: "Use existing tokens or enter new ones?",
+      choices: [
+        { name: `Use existing (${existingEnv["SLACK_BOT_TOKEN"]!.slice(0, 14)}...)`, value: "existing" },
+        { name: "Enter new tokens manually", value: "manual" },
+      ],
+    });
+
+    if (tokenSource === "existing") {
+      botToken = existingEnv["SLACK_BOT_TOKEN"]!;
+      appToken = existingEnv["SLACK_APP_TOKEN"]!;
+    } else {
+      botToken = await password({
+        message: "Bot token (xoxb-...):",
+        validate: (v) => v.startsWith("xoxb-") || "Must start with xoxb-",
+      });
+      appToken = await password({
+        message: "App token for Socket Mode (xapp-...):",
+        validate: (v) => v.startsWith("xapp-") || "Must start with xapp-",
+      });
+    }
+  } else {
+    console.log(`\nSlack credentials (from https://api.slack.com/apps):`);
+    botToken = await password({
+      message: "Bot token (xoxb-...):",
+      validate: (v) => v.startsWith("xoxb-") || "Must start with xoxb-",
+    });
+    appToken = await password({
+      message: "App token for Socket Mode (xapp-...):",
+      validate: (v) => v.startsWith("xapp-") || "Must start with xapp-",
+    });
+  }
 
   // --- Gateway ---
   console.log("\nopenclaw gateway connection:");
 
   const gatewayUrl = await input({
     message: "Gateway WebSocket URL:",
-    default: "ws://127.0.0.1:18789",
+    default: existingEnv["OPENCLAW_GATEWAY_URL"] ?? "ws://127.0.0.1:18789",
   });
 
   const gatewayTokenRaw = await password({
@@ -62,32 +130,16 @@ export async function runInit(): Promise<void> {
     validate: (v) => /^[a-z0-9-]{1,80}$/.test(v) || "Use lowercase letters, numbers, and hyphens only",
   });
 
-  // --- Write .env ---
-  const envLines = [
-    `SLACK_BOT_TOKEN=${botToken}`,
-    `SLACK_APP_TOKEN=${appToken}`,
-    `OPENCLAW_GATEWAY_URL=${gatewayUrl}`,
-    ...(gatewayTokenRaw ? [`OPENCLAW_GATEWAY_TOKEN=${gatewayTokenRaw}`] : []),
-  ];
+  // --- Write tokens to ~/.openclaw/.env ---
+  const newEnvPairs: Record<string, string> = {
+    SLACK_BOT_TOKEN: botToken,
+    SLACK_APP_TOKEN: appToken,
+    OPENCLAW_GATEWAY_URL: gatewayUrl,
+    ...(gatewayTokenRaw ? { OPENCLAW_GATEWAY_TOKEN: gatewayTokenRaw } : {}),
+  };
 
-  // Merge with existing .env if present
-  if (existsSync(ENV_PATH)) {
-    const existing = readFileSync(ENV_PATH, "utf-8");
-    const existingKeys = new Set(
-      existing.split("\n").map((l) => l.split("=")[0]).filter(Boolean),
-    );
-    const newLines = envLines.filter((l) => {
-      const key = l.split("=")[0];
-      return !existingKeys.has(key);
-    });
-    if (newLines.length > 0) {
-      writeFileSync(ENV_PATH, existing.trimEnd() + "\n" + newLines.join("\n") + "\n", "utf-8");
-    }
-  } else {
-    writeFileSync(ENV_PATH, envLines.join("\n") + "\n", "utf-8");
-  }
-
-  console.log(`\n✅ Written ${ENV_PATH}`);
+  appendToOpenclawEnv(newEnvPairs);
+  console.log(`\n✅ Tokens saved to ${OPENCLAW_ENV_PATH}`);
 
   // --- Write config ---
   const config: SubagentConfig = {
@@ -113,7 +165,7 @@ Next steps:
   2. Copy the channel ID (right-click → View channel details → copy ID starting with C...)
   3. Add it to ${DEFAULT_CONFIG_PATH}:
        "mainChannelId": "CXXXXXXXXX"
-  4. Run: openclaw-slack-router start
+  4. Restart openclaw: openclaw gateway restart
 
 On first start, the bot will post setup instructions in #${mainChannelName}.
 From there, say  new channel <name>  to create project channels.

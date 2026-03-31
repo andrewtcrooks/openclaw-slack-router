@@ -1,4 +1,11 @@
-import "dotenv/config";
+import { config as dotenvConfig } from "dotenv";
+import { join } from "node:path";
+import { homedir } from "node:os";
+
+// Load ~/.openclaw/.env first (openclaw's canonical env store), then fall back to local .env
+dotenvConfig({ path: join(homedir(), ".openclaw", ".env") });
+dotenvConfig(); // local .env — skips keys already set
+
 import { loadConfig } from "./config.js";
 import { startSlackBot } from "./bot.js";
 

@@ -133,6 +133,8 @@ If no agent prefix is given, the message goes to the default agent (openclaw-gat
 
 ## Environment variables
 
+The plugin reads these from `~/.openclaw/.env` (openclaw's canonical env file). The setup wizard (`openclaw slack setup`) writes them there automatically.
+
 | Variable | Required | Description |
 |----------|----------|-------------|
 | `SLACK_BOT_TOKEN` | Yes | Bot OAuth token (`xoxb-...`) |
