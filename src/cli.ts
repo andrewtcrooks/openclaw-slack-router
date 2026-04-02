@@ -16,6 +16,17 @@ program
   .action(runInit);
 
 program
+  .command("reset-intro")
+  .description("Clear the introPosted flag so the bot re-posts its welcome message on next start")
+  .action(async () => {
+    const { loadSubagentConfig, saveSubagentConfig, DEFAULT_CONFIG_PATH } = await import("./config.js");
+    const config = loadSubagentConfig();
+    config.introPosted = false;
+    saveSubagentConfig(config, DEFAULT_CONFIG_PATH);
+    console.log("✅ introPosted reset. Restart the gateway to re-post the welcome message.");
+  });
+
+program
   .command("start")
   .description("Start the Slack router (same as npm start)")
   .action(async () => {

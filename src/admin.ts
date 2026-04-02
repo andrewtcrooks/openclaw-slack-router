@@ -100,14 +100,25 @@ export async function handleAdminCommand(params: {
   return null;
 }
 
+type Logger = { info: (m: string) => void; warn: (m: string) => void; error: (m: string) => void };
+
 export async function postIntroIfNeeded(params: {
   client: any;
   config: SubagentConfig;
   configPath?: string;
+  logger?: Logger;
 }): Promise<void> {
-  const { client, config, configPath } = params;
-  if (!config.mainChannelId) return;
-  if (config.introPosted) return;
+  const { client, config, configPath, logger = console } = params;
+
+  if (!config.mainChannelId) {
+    logger.warn("openclaw-slack-router: mainChannelId not set — skipping intro message. Run `openclaw slack setup` to configure it.");
+    return;
+  }
+
+  if (config.introPosted) {
+    logger.info(`openclaw-slack-router: intro already posted to ${config.mainChannelId}, skipping.`);
+    return;
+  }
 
   try {
     await client.chat.postMessage({
@@ -115,10 +126,11 @@ export async function postIntroIfNeeded(params: {
       text: INTRO_MESSAGE,
       mrkdwn: true,
     });
-
+    logger.info(`openclaw-slack-router: intro posted to ${config.mainChannelId}`);
     config.introPosted = true;
     saveSubagentConfig(config, configPath);
-  } catch {
-    // Non-fatal: channel may not exist yet or bot not invited
+  } catch (err: any) {
+    logger.error(`openclaw-slack-router: failed to post intro to ${config.mainChannelId}: ${err?.data?.error ?? err?.message ?? String(err)}`);
+    logger.error("  Ensure the bot is invited to the channel and the channel ID is correct.");
   }
 }

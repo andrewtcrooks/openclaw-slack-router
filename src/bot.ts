@@ -56,7 +56,7 @@ export async function startSlackBot(options: SlackBotOptions): Promise<void> {
   await app.start();
   log.info(`${subagentConfig.botName} is running in Socket Mode (bot user: ${botUserId})`);
 
-  await postIntroIfNeeded({ client, config: subagentConfig, configPath });
+  await postIntroIfNeeded({ client, config: subagentConfig, configPath, logger: log });
 }
 
 export async function stopSlackBot(): Promise<void> {

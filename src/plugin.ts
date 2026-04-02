@@ -1,6 +1,6 @@
 import { startSlackBot, stopSlackBot } from "./bot.js";
 import { runInit } from "./commands/init.js";
-import { DEFAULT_CONFIG_PATH } from "./config.js";
+import { DEFAULT_CONFIG_PATH, loadSubagentConfig, saveSubagentConfig } from "./config.js";
 
 // Minimal types for the openclaw plugin API — no runtime dependency on openclaw required.
 // The full types are at openclaw/plugin-sdk if you want to import them as a dev dep.
@@ -141,6 +141,16 @@ const plugin = {
           .command("setup")
           .description("Interactive setup wizard — configure tokens and main channel")
           .action(runInit);
+
+        cmd
+          .command("reset-intro")
+          .description("Clear the introPosted flag so the bot re-posts its welcome message on next gateway restart")
+          .action(() => {
+            const config = loadSubagentConfig(DEFAULT_CONFIG_PATH);
+            config.introPosted = false;
+            saveSubagentConfig(config, DEFAULT_CONFIG_PATH);
+            console.log("✅ introPosted reset. Restart the gateway to re-post the welcome message.");
+          });
       },
       { commands: ["slack"] },
     );
