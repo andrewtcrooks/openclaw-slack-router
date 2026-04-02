@@ -94,8 +94,8 @@ const plugin = {
       id: "openclaw-slack-router",
 
       async start(ctx) {
-        const botToken = pluginCfg.botToken;
-        const appToken = pluginCfg.appToken;
+        const botToken = pluginCfg.botToken ?? process.env.SLACK_BOT_TOKEN;
+        const appToken = pluginCfg.appToken ?? process.env.SLACK_APP_TOKEN;
 
         if (!botToken || !appToken) {
           ctx.logger.error(
@@ -115,7 +115,7 @@ const plugin = {
             pluginCfg.gatewayUrl ??
             (process.env.OPENCLAW_GATEWAY_URL as string) ??
             "ws://127.0.0.1:18789",
-          gatewayToken: pluginCfg.gatewayToken,
+          gatewayToken: pluginCfg.gatewayToken ?? process.env.OPENCLAW_GATEWAY_TOKEN,
           configPath,
           logger: ctx.logger,
         });
