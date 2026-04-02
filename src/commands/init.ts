@@ -130,6 +130,14 @@ export async function runInit(): Promise<void> {
     validate: (v) => /^[a-z0-9-]{1,80}$/.test(v) || "Use lowercase letters, numbers, and hyphens only",
   });
 
+  console.log(`\nCreate #${mainChannelName} in Slack and invite your bot to it if you haven't already.`);
+  console.log("Then find the channel ID: right-click the channel → View channel details → copy the ID starting with C...");
+
+  const mainChannelId = await input({
+    message: "Channel ID (leave blank to set later):",
+    validate: (v) => v === "" || /^C[A-Z0-9]+$/.test(v) || "Channel ID should start with C followed by uppercase letters/numbers",
+  });
+
   // --- Write tokens to ~/.openclaw/.env ---
   const newEnvPairs: Record<string, string> = {
     SLACK_BOT_TOKEN: botToken,
@@ -144,7 +152,7 @@ export async function runInit(): Promise<void> {
   // --- Write config ---
   const config: SubagentConfig = {
     botName,
-    mainChannelId: null, // filled in after bot creates/joins the channel on first start
+    mainChannelId: mainChannelId || null,
     introPosted: false,
     defaultAgent: "default",
     agents: {
@@ -159,13 +167,16 @@ export async function runInit(): Promise<void> {
   saveSubagentConfig(config);
   console.log(`✅ Written ${DEFAULT_CONFIG_PATH}`);
 
+  const channelIdStep = mainChannelId
+    ? ""
+    : `  2. Copy the channel ID (right-click → View channel details → copy ID starting with C...)
+  3. Add it to ${DEFAULT_CONFIG_PATH}:
+       "mainChannelId": "CXXXXXXXXX"\n`;
+
   console.log(`
 Next steps:
   1. Create a Slack channel named #${mainChannelName} and invite your bot to it
-  2. Copy the channel ID (right-click → View channel details → copy ID starting with C...)
-  3. Add it to ${DEFAULT_CONFIG_PATH}:
-       "mainChannelId": "CXXXXXXXXX"
-  4. Restart openclaw: openclaw gateway restart
+${channelIdStep}  ${mainChannelId ? "2" : "4"}. Restart openclaw: openclaw gateway restart
 
 On first start, the bot will post setup instructions in #${mainChannelName}.
 From there, say  new channel <name>  to create project channels.
