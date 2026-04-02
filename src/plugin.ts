@@ -90,11 +90,7 @@ const plugin = {
   register(api: PluginApi) {
     const pluginCfg = (api.pluginConfig ?? {}) as PluginConfig;
 
-    const hasTokens =
-      (pluginCfg.botToken || process.env.SLACK_BOT_TOKEN) &&
-      (pluginCfg.appToken || process.env.SLACK_APP_TOKEN);
-
-    if (!hasTokens) {
+    if (!pluginCfg.botToken && !pluginCfg.appToken) {
       console.warn(
         "\n⚠️  openclaw-slack-router: Slack tokens not configured.\n" +
         "   Run `openclaw slack setup` before starting the gateway.\n",
@@ -105,24 +101,11 @@ const plugin = {
       id: "openclaw-slack-router",
 
       async start(ctx) {
-        const botToken = pluginCfg.botToken ?? process.env.SLACK_BOT_TOKEN;
-        const appToken = pluginCfg.appToken ?? process.env.SLACK_APP_TOKEN;
-
-        if (!botToken || !appToken) {
-          ctx.logger.error(
-            "openclaw-slack-router: not configured. Run `openclaw slack setup` before restarting the gateway.",
-          );
-          return;
-        }
-
         await startSlackBot({
-          botToken,
-          appToken,
-          gatewayUrl:
-            pluginCfg.gatewayUrl ??
-            (process.env.OPENCLAW_GATEWAY_URL as string) ??
-            "ws://127.0.0.1:18789",
-          gatewayToken: pluginCfg.gatewayToken ?? process.env.OPENCLAW_GATEWAY_TOKEN,
+          botToken: pluginCfg.botToken,
+          appToken: pluginCfg.appToken,
+          gatewayUrl: pluginCfg.gatewayUrl,
+          gatewayToken: pluginCfg.gatewayToken,
           configPath: DEFAULT_CONFIG_PATH,
           logger: ctx.logger,
         });

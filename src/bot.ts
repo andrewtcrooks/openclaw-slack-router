@@ -5,9 +5,9 @@ import { postIntroIfNeeded } from "./admin.js";
 import type { SubagentConfig } from "./types.js";
 
 export interface SlackBotOptions {
-  botToken: string;
-  appToken: string;
-  gatewayUrl: string;
+  botToken?: string;
+  appToken?: string;
+  gatewayUrl?: string;
   gatewayToken?: string;
   /** Path to openclaw-slack-router.config.json. Defaults to ./openclaw-slack-router.config.json */
   configPath?: string;
@@ -22,8 +22,18 @@ export interface SlackBotOptions {
 let runningApp: any = null;
 
 export async function startSlackBot(options: SlackBotOptions): Promise<void> {
-  const { botToken, appToken, gatewayUrl, gatewayToken, configPath, logger } = options;
-  const log = logger ?? console;
+  const log = options.logger ?? console;
+
+  const botToken = options.botToken ?? process.env.SLACK_BOT_TOKEN;
+  const appToken = options.appToken ?? process.env.SLACK_APP_TOKEN;
+  const gatewayUrl = options.gatewayUrl ?? process.env.OPENCLAW_GATEWAY_URL ?? "ws://127.0.0.1:18789";
+  const gatewayToken = options.gatewayToken ?? process.env.OPENCLAW_GATEWAY_TOKEN;
+  const { configPath } = options;
+
+  if (!botToken || !appToken) {
+    log.error("openclaw-slack-router: not configured. Run `openclaw slack setup` before restarting the gateway.");
+    return;
+  }
 
   const subagentConfig: SubagentConfig = loadSubagentConfig(configPath ?? DEFAULT_CONFIG_PATH);
 
