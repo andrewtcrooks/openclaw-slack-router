@@ -15,7 +15,7 @@ A Slack router plugin for [openclaw](https://github.com/openclaw/openclaw). Conn
 ## Install
 
 ```
-openclaw plugins install npm:@datanovallc/openclaw-slack-router
+openclaw plugins install @datanovallc/openclaw-slack-router
 ```
 
 Then restart your openclaw gateway:

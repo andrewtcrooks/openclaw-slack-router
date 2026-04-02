@@ -27,6 +27,9 @@
   "bin": {
     "openclaw-slack-router": "dist/cli.js"
   },
+  "openclaw": {
+    "extensions": ["./dist/plugin.js"]
+  },
   "files": [
     "dist",
     "openclaw.plugin.json"
