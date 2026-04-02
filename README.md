@@ -1,69 +1,71 @@
 # openclaw-slack-router
 
-A Slack router plugin for [openclaw](https://github.com/openclaw/openclaw). Connect your openclaw agent to Slack with per-channel context isolation — each channel is an independent project context, managed entirely through chat.
+A Slack plugin for [openclaw](https://github.com/openclaw/openclaw). Each Slack channel is an isolated project context — no cross-project bleed, managed entirely through chat.
 
 ## How it works
 
-1. Install via openclaw's plugin system
-2. Configure your Slack tokens (`openclaw config set ...` or `openclaw slack setup`)
-3. Start openclaw — the Slack bot starts automatically as a service
-4. Your main channel posts setup instructions on first start
-5. Say `new channel my-project` in the main channel to create a project channel
-6. Mention the bot in any project channel — it routes your message to openclaw and replies in-thread
-7. Each channel maintains its own context — `#project-a` and `#project-b` never bleed into each other
+- Each Slack channel is a separate project context (`#project-a` and `#project-b` never share history)
+- Mention the bot in any registered channel — it sends your message to openclaw and replies in-thread
+- Manage channels by chatting with the bot in your main channel
 
-## Install
+## Setup
+
+### 1. Create a Slack app
+
+In the [Slack app console](https://api.slack.com/apps), create a new app and configure:
+
+- **Socket Mode** — enable it under Settings → Socket Mode, generate an App Token (`xapp-...`) under Settings → Basic Information → App-Level Tokens
+- **Bot Token** — under OAuth & Permissions → Install to Workspace, copy the Bot OAuth Token (`xoxb-...`)
+- **OAuth scopes:** `app_mentions:read`, `channels:history`, `channels:join`, `channels:manage`, `chat:write`, `groups:history`, `im:history`
+- **Event subscriptions:** `app_mention`, `message.im`
+
+### 2. Install the plugin
 
 ```
 openclaw plugins install @datanovallc/openclaw-slack-router
 ```
 
-## Quick start
-
-### 1. Create a Slack app
-
-In the [Slack app console](https://api.slack.com/apps):
-
-- **Enable Socket Mode** — generate an App Token (`xapp-...`) under Settings → Basic Information → App-Level Tokens
-- **Add a Bot Token** (`xoxb-...`) under OAuth & Permissions → Install to Workspace
-- **Required OAuth scopes:** `app_mentions:read`, `channels:history`, `channels:join`, `channels:manage`, `chat:write`, `groups:history`, `im:history`
-- **Subscribe to bot events:** `app_mention`, `message.im`
-
-### 2. Run the setup wizard
+### 3. Configure your tokens
 
 ```
 openclaw slack setup
 ```
 
-The wizard asks for your tokens, gateway URL, and a name for your main channel. It writes your tokens to `~/.openclaw/.env`.
+The wizard asks for your Bot Token, App Token, and gateway URL. It saves them to `~/.openclaw/.env`.
 
-### 3. Invite the bot to your main channel
+### 4. Create your main channel in Slack
 
-Create the channel you named during setup, then invite your bot user to it. Copy the channel ID (right-click the channel → View channel details → copy the ID starting with `C...`), then add it to `openclaw-slack-router.config.json`:
+In Slack, create a channel (e.g. `#rook-main`) and invite your bot user to it.
 
+### 5. Set the main channel ID
+
+Right-click the channel in Slack → **View channel details** → copy the channel ID (starts with `C`).
+
+Find the config file at:
+```
+~/.openclaw/state/@datanovallc-openclaw-slack-router-*/openclaw-slack-router.config.json
+```
+
+Add the channel ID:
 ```json
 {
   "mainChannelId": "CXXXXXXXXX"
 }
 ```
 
-### 4. Start
+### 6. Restart openclaw
 
 ```
-npx openclaw-slack-router start
+openclaw gateway restart
 ```
 
-Or if installed locally:
+The bot posts a welcome message in your main channel on first start.
 
-```
-npm start
-```
+## Using the bot
 
-On first start, the bot posts a welcome message in your main channel with instructions for creating project channels.
+### Create project channels
 
-## Managing channels via chat
-
-Everything is done by talking to the bot in your main channel:
+In your main channel, tell the bot:
 
 | Say this | What happens |
 |----------|-------------|
@@ -72,26 +74,33 @@ Everything is done by talking to the bot in your main channel:
 | `remove channel my-project` | Unregisters the channel (Slack channel still exists) |
 | `help` | Shows available commands |
 
-## Routing messages
+### Chat in a project channel
 
-In any project channel, mention the bot:
+Mention the bot to send a message to openclaw:
 
 ```
 @YourBot what's the status of the API migration?
 ```
 
-To route to a specific agent explicitly:
-
+Route to a specific agent:
 ```
 @YourBot /research find recent papers on RAG architectures
-@YourBot research: find recent papers on RAG architectures
 ```
 
-If no agent prefix is given, the message goes to the default agent (openclaw-gateway).
+## Environment variables
 
-## Configuration
+Set in `~/.openclaw/.env` by the setup wizard.
 
-`openclaw-slack-router.config.json` is created by `init` and managed by the bot. You can also edit it directly:
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `SLACK_BOT_TOKEN` | Yes | Bot OAuth token (`xoxb-...`) |
+| `SLACK_APP_TOKEN` | Yes | Socket Mode app token (`xapp-...`) |
+| `OPENCLAW_GATEWAY_URL` | No | Gateway WebSocket URL (default: `ws://127.0.0.1:18789`) |
+| `OPENCLAW_GATEWAY_TOKEN` | No | Gateway auth token if your gateway requires one |
+
+## Configuration file
+
+`openclaw-slack-router.config.json` lives in openclaw's state directory and is managed by the bot. You can also edit it directly:
 
 ```json
 {
@@ -122,29 +131,6 @@ If no agent prefix is given, the message goes to the default agent (openclaw-gat
 | `defaultAgent` | Which agent handles unrouted messages |
 | `agents` | Registered agent names and descriptions |
 | `channels` | Active project channels; `historyLimit` controls how many messages are fetched for context |
-
-**This file is gitignored** — your channel config and tokens stay local.
-
-## Environment variables
-
-The plugin reads these from `~/.openclaw/.env` (openclaw's canonical env file). The setup wizard (`openclaw slack setup`) writes them there automatically.
-
-| Variable | Required | Description |
-|----------|----------|-------------|
-| `SLACK_BOT_TOKEN` | Yes | Bot OAuth token (`xoxb-...`) |
-| `SLACK_APP_TOKEN` | Yes | Socket Mode app token (`xapp-...`) |
-| `OPENCLAW_GATEWAY_URL` | No | Gateway WebSocket URL (default: `ws://127.0.0.1:18789`) |
-| `OPENCLAW_GATEWAY_TOKEN` | No | Gateway auth token if your gateway requires one |
-
-## Channel context model
-
-Each Slack channel is an isolated project context:
-
-- `#project-openclaw` only sees openclaw conversation history
-- `#project-datanova` only sees datanova history
-- No cross-project token burn, no context bleed
-
-Context is built from **full channel history** (`conversations.history`), not individual thread replies. Threads are for sub-discussions — the context sent to openclaw is always the whole channel.
 
 ## Adding a custom subagent
 
