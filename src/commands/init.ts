@@ -105,11 +105,16 @@ export async function runInit(): Promise<void> {
     validate: (v) => v === "" || /^C[A-Z0-9]+$/.test(v) || "Channel ID should start with C followed by uppercase letters/numbers",
   });
 
+  const DEFAULT_GATEWAY_URL = "ws://127.0.0.1:18789";
+
   // --- Write tokens to ~/.openclaw/.env ---
+  // Only write OPENCLAW_GATEWAY_URL if it differs from the default — setting it
+  // explicitly causes openclaw to treat it as an override and require auth credentials
+  // for its security audit deep probe, even when pointing at the local gateway.
   appendToOpenclawEnv({
     SLACK_BOT_TOKEN: botToken,
     SLACK_APP_TOKEN: appToken,
-    OPENCLAW_GATEWAY_URL: gatewayUrl,
+    ...(gatewayUrl !== DEFAULT_GATEWAY_URL ? { OPENCLAW_GATEWAY_URL: gatewayUrl } : {}),
     ...(gatewayTokenRaw ? { OPENCLAW_GATEWAY_TOKEN: gatewayTokenRaw } : {}),
   });
   console.log(`\n✅ Tokens saved to ${OPENCLAW_ENV_PATH}`);
