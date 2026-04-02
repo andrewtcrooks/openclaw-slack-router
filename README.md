@@ -21,9 +21,11 @@ In the [Slack app console](https://api.slack.com/apps), create a new app and con
 
 ### 2. Install the plugin
 
+<!-- AUTO:install-cmd -->
 ```
-openclaw plugins install @datanovallc/openclaw-slack-router
+openclaw plugins install @datanovallc/openclaw-slack-router@0.1.17
 ```
+<!-- /AUTO:install-cmd -->
 
 ### 3. Configure your tokens
 
@@ -70,9 +72,9 @@ In your main channel, tell the bot:
 <!-- AUTO:bot-commands -->
 | Say this | What happens |
 |----------|-------------|
-| `new channel my-project` | create a new project channel (e.g. `new channel my-project`) |
-| `list channels` | show all active channels |
-| `remove channel my-project` | deactivate a channel |
+| `new channel my-project` | Create a new project channel (e.g. `new channel my-project`) |
+| `list channels` | Show all active channels |
+| `remove channel my-project` | Deactivate a channel |
 | `help` | Shows available commands |
 <!-- /AUTO:bot-commands -->
 

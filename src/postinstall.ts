@@ -3,9 +3,8 @@
  * Runs automatically after `npm install` when this package is installed as a dependency.
  * Skips when running `npm install` in the package's own dev directory.
  */
-import { existsSync, readFileSync } from "node:fs";
-import { homedir } from "node:os";
 import path from "node:path";
+import { OPENCLAW_ENV_PATH, parseEnvFile } from "./config.js";
 import { runInit } from "./commands/init.js";
 
 // Skip when this is a local dev `npm install` (not being installed as a plugin)
@@ -15,12 +14,10 @@ if (initCwd === pkgDir || initCwd === "") {
   process.exit(0);
 }
 
-const envPath = path.join(homedir(), ".openclaw", ".env");
-
 function hasTokens(): boolean {
-  if (!existsSync(envPath)) return false;
-  const contents = readFileSync(envPath, "utf-8");
-  return contents.includes("SLACK_BOT_TOKEN=xoxb-") && contents.includes("SLACK_APP_TOKEN=xapp-");
+  const env = parseEnvFile(OPENCLAW_ENV_PATH);
+  return env["SLACK_BOT_TOKEN"]?.startsWith("xoxb-") === true &&
+    env["SLACK_APP_TOKEN"]?.startsWith("xapp-") === true;
 }
 
 if (hasTokens()) {

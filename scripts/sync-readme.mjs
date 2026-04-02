@@ -15,6 +15,12 @@ function read(rel) {
   return readFileSync(path.join(root, rel), "utf-8");
 }
 
+// install-cmd: pinned version from package.json
+function buildInstallCmd() {
+  const { name, version } = JSON.parse(read("package.json"));
+  return `\`\`\`\nopenclaw plugins install ${name}@${version}\n\`\`\``;
+}
+
 function replaceSection(readme, key, content) {
   const open = `<!-- AUTO:${key} -->`;
   const close = `<!-- /AUTO:${key} -->`;
@@ -105,6 +111,7 @@ function buildConfigFieldsTable() {
 let readme = read("README.md");
 
 for (const [key, fn] of [
+  ["install-cmd", buildInstallCmd],
   ["bot-commands", buildBotCommandsTable],
   ["env-vars", buildEnvVarsTable],
   ["config-fields", buildConfigFieldsTable],

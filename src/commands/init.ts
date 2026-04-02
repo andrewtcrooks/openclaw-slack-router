@@ -1,46 +1,13 @@
 import { input, password, confirm, select } from "@inquirer/prompts";
-import { writeFileSync, existsSync, readFileSync } from "node:fs";
-import { homedir } from "node:os";
-import path from "node:path";
-import { saveSubagentConfig, DEFAULT_CONFIG_PATH } from "../config.js";
+import { existsSync } from "node:fs";
+import {
+  saveSubagentConfig,
+  DEFAULT_CONFIG_PATH,
+  OPENCLAW_ENV_PATH,
+  parseEnvFile,
+  appendToOpenclawEnv,
+} from "../config.js";
 import type { SubagentConfig } from "../types.js";
-
-const OPENCLAW_ENV_PATH = path.join(homedir(), ".openclaw", ".env");
-
-/** Parse a .env file into a key→value map (skips comments and blank lines). */
-function parseEnvFile(filePath: string): Record<string, string> {
-  if (!existsSync(filePath)) return {};
-  const lines = readFileSync(filePath, "utf-8").split("\n");
-  const result: Record<string, string> = {};
-  for (const line of lines) {
-    const trimmed = line.trim();
-    if (!trimmed || trimmed.startsWith("#")) continue;
-    const idx = trimmed.indexOf("=");
-    if (idx === -1) continue;
-    result[trimmed.slice(0, idx)] = trimmed.slice(idx + 1);
-  }
-  return result;
-}
-
-/** Append new KEY=VALUE pairs to ~/.openclaw/.env, skipping keys that already exist. */
-function appendToOpenclawEnv(pairs: Record<string, string>): void {
-  const existing = parseEnvFile(OPENCLAW_ENV_PATH);
-  const newLines = Object.entries(pairs)
-    .filter(([k]) => !existing[k])
-    .map(([k, v]) => `${k}=${v}`);
-
-  if (newLines.length === 0) return;
-
-  const current = existsSync(OPENCLAW_ENV_PATH)
-    ? readFileSync(OPENCLAW_ENV_PATH, "utf-8").trimEnd()
-    : "";
-  const separator = current ? "\n" : "";
-  writeFileSync(
-    OPENCLAW_ENV_PATH,
-    current + separator + "\n" + newLines.join("\n") + "\n",
-    "utf-8",
-  );
-}
 
 export async function runInit(): Promise<void> {
   console.log("\nopenclaw-slack-router setup\n");
@@ -139,14 +106,12 @@ export async function runInit(): Promise<void> {
   });
 
   // --- Write tokens to ~/.openclaw/.env ---
-  const newEnvPairs: Record<string, string> = {
+  appendToOpenclawEnv({
     SLACK_BOT_TOKEN: botToken,
     SLACK_APP_TOKEN: appToken,
     OPENCLAW_GATEWAY_URL: gatewayUrl,
     ...(gatewayTokenRaw ? { OPENCLAW_GATEWAY_TOKEN: gatewayTokenRaw } : {}),
-  };
-
-  appendToOpenclawEnv(newEnvPairs);
+  });
   console.log(`\n✅ Tokens saved to ${OPENCLAW_ENV_PATH}`);
 
   // --- Write config ---
