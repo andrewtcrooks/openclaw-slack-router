@@ -2,6 +2,7 @@ import { input, password, confirm, select } from "@inquirer/prompts";
 import { writeFileSync, existsSync, readFileSync } from "node:fs";
 import { homedir } from "node:os";
 import path from "node:path";
+import { execFileSync } from "node:child_process";
 import { saveSubagentConfig, DEFAULT_CONFIG_PATH } from "../config.js";
 import type { SubagentConfig } from "../types.js";
 
@@ -167,18 +168,26 @@ export async function runInit(): Promise<void> {
   saveSubagentConfig(config);
   console.log(`✅ Written ${DEFAULT_CONFIG_PATH}`);
 
-  const channelIdStep = mainChannelId
-    ? ""
-    : `  2. Copy the channel ID (right-click → View channel details → copy ID starting with C...)
-  3. Add it to ${DEFAULT_CONFIG_PATH}:
-       "mainChannelId": "CXXXXXXXXX"\n`;
-
-  console.log(`
+  if (!mainChannelId) {
+    const channelIdStep =
+      `  2. Copy the channel ID (right-click → View channel details → copy ID starting with C...)\n` +
+      `  3. Add it to ${DEFAULT_CONFIG_PATH}:\n` +
+      `       "mainChannelId": "CXXXXXXXXX"\n`;
+    console.log(`
 Next steps:
   1. Create a Slack channel named #${mainChannelName} and invite your bot to it
-${channelIdStep}  ${mainChannelId ? "2" : "4"}. Restart openclaw: openclaw gateway restart
+${channelIdStep}  4. Restart openclaw: openclaw gateway restart
 
 On first start, the bot will post setup instructions in #${mainChannelName}.
 From there, say  new channel <name>  to create project channels.
 `);
+    return;
+  }
+
+  console.log("\nSetup complete! Restarting openclaw gateway...\n");
+  try {
+    execFileSync("openclaw", ["gateway", "restart"], { stdio: "inherit" });
+  } catch {
+    console.log("Could not restart automatically. Run this to start the bot:\n\n  openclaw gateway restart\n");
+  }
 }
