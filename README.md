@@ -67,12 +67,14 @@ The bot posts a welcome message in your main channel on first start.
 
 In your main channel, tell the bot:
 
+<!-- AUTO:bot-commands -->
 | Say this | What happens |
 |----------|-------------|
-| `new channel my-project` | Creates `#my-project` in Slack, joins it, registers it for routing |
-| `list channels` | Shows all registered project channels |
-| `remove channel my-project` | Unregisters the channel (Slack channel still exists) |
+| `new channel my-project` | create a new project channel (e.g. `new channel my-project`) |
+| `list channels` | show all active channels |
+| `remove channel my-project` | deactivate a channel |
 | `help` | Shows available commands |
+<!-- /AUTO:bot-commands -->
 
 ### Chat in a project channel
 
@@ -91,12 +93,14 @@ Route to a specific agent:
 
 Set in `~/.openclaw/.env` by the setup wizard.
 
+<!-- AUTO:env-vars -->
 | Variable | Required | Description |
 |----------|----------|-------------|
-| `SLACK_BOT_TOKEN` | Yes | Bot OAuth token (`xoxb-...`) |
-| `SLACK_APP_TOKEN` | Yes | Socket Mode app token (`xapp-...`) |
-| `OPENCLAW_GATEWAY_URL` | No | Gateway WebSocket URL (default: `ws://127.0.0.1:18789`) |
-| `OPENCLAW_GATEWAY_TOKEN` | No | Gateway auth token if your gateway requires one |
+| `SLACK_BOT_TOKEN` | Yes | Slack bot OAuth token (xoxb-...) |
+| `SLACK_APP_TOKEN` | Yes | Slack app-level token for Socket Mode (xapp-...) |
+| `OPENCLAW_GATEWAY_URL` | No | openclaw gateway WebSocket URL |
+| `OPENCLAW_GATEWAY_TOKEN` | No | Gateway auth token (if your gateway requires one) |
+<!-- /AUTO:env-vars -->
 
 ## Configuration file
 
@@ -123,6 +127,7 @@ Set in `~/.openclaw/.env` by the setup wizard.
 }
 ```
 
+<!-- AUTO:config-fields -->
 | Field | Description |
 |-------|-------------|
 | `botName` | Display name used in logs and error messages |
@@ -131,6 +136,7 @@ Set in `~/.openclaw/.env` by the setup wizard.
 | `defaultAgent` | Which agent handles unrouted messages |
 | `agents` | Registered agent names and descriptions |
 | `channels` | Active project channels; `historyLimit` controls how many messages are fetched for context |
+<!-- /AUTO:config-fields -->
 
 ## Adding a custom subagent
 

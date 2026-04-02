@@ -42,6 +42,7 @@
     "start": "node dist/index.js",
     "typecheck": "tsc --noEmit",
     "test": "vitest run --reporter=verbose",
+    "sync-readme": "node scripts/sync-readme.mjs",
     "postinstall": "node --input-type=module --eval \"import('./dist/postinstall.js').catch(()=>{})\"",
     "prepublishOnly": "npm run build"
   },
