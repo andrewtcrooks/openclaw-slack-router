@@ -43,12 +43,9 @@ In Slack, create a channel (e.g. `#rook-main`) and invite your bot user to it.
 
 Right-click the channel in Slack → **View channel details** → copy the channel ID (starts with `C`).
 
-Find the config file at:
-```
-~/.openclaw/state/@datanovallc-openclaw-slack-router-*/openclaw-slack-router.config.json
-```
+The setup wizard (step 3) asks for this ID — if you provided it there, skip this step.
 
-Add the channel ID:
+Otherwise, add it to the config file at `~/.openclaw/openclaw-slack-router.config.json`:
 ```json
 {
   "mainChannelId": "CXXXXXXXXX"
