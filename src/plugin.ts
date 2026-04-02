@@ -1,6 +1,6 @@
-import path from "node:path";
 import { startSlackBot, stopSlackBot } from "./bot.js";
 import { runInit } from "./commands/init.js";
+import { DEFAULT_CONFIG_PATH } from "./config.js";
 
 // Minimal types for the openclaw plugin API — no runtime dependency on openclaw required.
 // The full types are at openclaw/plugin-sdk if you want to import them as a dev dep.
@@ -105,9 +105,6 @@ const plugin = {
           return;
         }
 
-        // Config file lives in the openclaw state directory so it persists across installs
-        const configPath = path.join(ctx.stateDir, "openclaw-slack-router.config.json");
-
         await startSlackBot({
           botToken,
           appToken,
@@ -116,7 +113,7 @@ const plugin = {
             (process.env.OPENCLAW_GATEWAY_URL as string) ??
             "ws://127.0.0.1:18789",
           gatewayToken: pluginCfg.gatewayToken ?? process.env.OPENCLAW_GATEWAY_TOKEN,
-          configPath,
+          configPath: DEFAULT_CONFIG_PATH,
           logger: ctx.logger,
         });
       },

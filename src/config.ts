@@ -1,5 +1,7 @@
 import { z } from "zod";
 import { readFileSync, writeFileSync } from "node:fs";
+import { homedir } from "node:os";
+import path from "node:path";
 import type { SubagentConfig } from "./types.js";
 
 const envSchema = z.object({
@@ -39,7 +41,7 @@ const subagentConfigSchema = z.object({
   channels: z.record(channelEntrySchema).default({}),
 });
 
-export const DEFAULT_CONFIG_PATH = "./openclaw-slack-router.config.json";
+export const DEFAULT_CONFIG_PATH = path.join(homedir(), ".openclaw", "openclaw-slack-router.config.json");
 
 export function loadSubagentConfig(
   path = DEFAULT_CONFIG_PATH,

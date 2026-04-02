@@ -107,10 +107,7 @@ export async function postIntroIfNeeded(params: {
 }): Promise<void> {
   const { client, config, configPath } = params;
   if (!config.mainChannelId) return;
-
-  // Track whether we've posted the intro via a sentinel in channels entry
-  const mainEntry = config.channels[config.mainChannelId];
-  if (mainEntry?.historyLimit === -1) return; // sentinel: intro already posted
+  if (config.introPosted) return;
 
   try {
     await client.chat.postMessage({
@@ -119,11 +116,7 @@ export async function postIntroIfNeeded(params: {
       mrkdwn: true,
     });
 
-    // Mark intro as posted
-    if (!config.channels[config.mainChannelId]) {
-      config.channels[config.mainChannelId] = { name: "main" };
-    }
-    config.channels[config.mainChannelId].historyLimit = -1;
+    config.introPosted = true;
     saveSubagentConfig(config, configPath);
   } catch {
     // Non-fatal: channel may not exist yet or bot not invited
