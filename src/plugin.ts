@@ -62,7 +62,7 @@ const plugin = {
           description: "Gateway auth token (if your gateway requires one)",
         },
       },
-      required: ["botToken", "appToken"],
+      required: [],
     },
     uiHints: {
       botToken: { label: "Bot Token", sensitive: true, placeholder: "xoxb-..." },
