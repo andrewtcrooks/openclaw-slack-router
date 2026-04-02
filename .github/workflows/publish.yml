@@ -30,6 +30,8 @@ jobs:
           git add README.md
           git diff --cached --quiet || git commit -m "docs: sync README for ${{ github.ref_name }} [skip ci]"
           git push origin HEAD:master
+      - name: Strip sync markers from README before publish
+        run: grep -v "^<!-- AUTO:\|^<!-- /AUTO:" README.md > README.clean.md && mv README.clean.md README.md
       - run: npm publish
       - name: Create GitHub Release
         env:
