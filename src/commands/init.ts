@@ -2,7 +2,6 @@ import { input, password, confirm, select } from "@inquirer/prompts";
 import { writeFileSync, existsSync, readFileSync } from "node:fs";
 import { homedir } from "node:os";
 import path from "node:path";
-import { execFileSync } from "node:child_process";
 import { saveSubagentConfig, DEFAULT_CONFIG_PATH } from "../config.js";
 import type { SubagentConfig } from "../types.js";
 
@@ -184,10 +183,12 @@ From there, say  new channel <name>  to create project channels.
     return;
   }
 
-  console.log("\nSetup complete! Restarting openclaw gateway...\n");
-  try {
-    execFileSync("openclaw", ["gateway", "restart"], { stdio: "inherit" });
-  } catch {
-    console.log("Could not restart automatically. Run this to start the bot:\n\n  openclaw gateway restart\n");
-  }
+  console.log(`
+✅ Setup complete! Run this to start the bot:
+
+  openclaw gateway restart
+
+On first start, the bot will post a welcome message in #${mainChannelName}.
+From there, say  new channel <name>  to create project channels.
+`);
 }
