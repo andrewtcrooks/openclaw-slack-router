@@ -90,31 +90,29 @@ const plugin = {
   register(api: PluginApi) {
     const pluginCfg = (api.pluginConfig ?? {}) as PluginConfig;
 
+    const hasTokens =
+      (pluginCfg.botToken || process.env.SLACK_BOT_TOKEN) &&
+      (pluginCfg.appToken || process.env.SLACK_APP_TOKEN);
+
+    if (!hasTokens) {
+      console.warn(
+        "\n⚠️  openclaw-slack-router: Slack tokens not configured.\n" +
+        "   Run `openclaw slack setup` before starting the gateway.\n",
+      );
+    }
+
     api.registerService({
       id: "openclaw-slack-router",
 
       async start(ctx) {
-        let botToken = pluginCfg.botToken ?? process.env.SLACK_BOT_TOKEN;
-        let appToken = pluginCfg.appToken ?? process.env.SLACK_APP_TOKEN;
+        const botToken = pluginCfg.botToken ?? process.env.SLACK_BOT_TOKEN;
+        const appToken = pluginCfg.appToken ?? process.env.SLACK_APP_TOKEN;
 
         if (!botToken || !appToken) {
-          if (process.stdin.isTTY) {
-            ctx.logger.info("openclaw-slack-router: running first-time setup wizard...");
-            await runInit();
-            // Reload env after wizard writes tokens
-            const { config: dotenvConfig } = await import("dotenv");
-            const { join } = await import("node:path");
-            const { homedir } = await import("node:os");
-            dotenvConfig({ path: join(homedir(), ".openclaw", ".env"), override: true });
-            botToken = process.env.SLACK_BOT_TOKEN;
-            appToken = process.env.SLACK_APP_TOKEN;
-          }
-          if (!botToken || !appToken) {
-            ctx.logger.error(
-              "openclaw-slack-router: not configured. Run `openclaw slack setup` to set your Slack tokens.",
-            );
-            return;
-          }
+          ctx.logger.error(
+            "openclaw-slack-router: not configured. Run `openclaw slack setup` before restarting the gateway.",
+          );
+          return;
         }
 
         await startSlackBot({
