@@ -1,6 +1,6 @@
 {
   "name": "@datanovallc/openclaw-slack-router",
-  "version": "0.1.12",
+  "version": "0.1.13",
   "description": "Slack router plugin for openclaw — connect your agent to Slack with per-channel context isolation",
   "keywords": [
     "openclaw",
