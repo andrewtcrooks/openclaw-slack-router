@@ -32,7 +32,7 @@ In the [Slack app console](https://api.slack.com/apps):
 
 - **Enable Socket Mode** — generate an App Token (`xapp-...`) under Settings → Basic Information
 - **Add a Bot Token** (`xoxb-...`) under OAuth & Permissions → Install to Workspace
-- **Required OAuth scopes:** `app_mentions:read`, `chat:write`, `channels:history`, `channels:join`, `channels:manage`, `groups:history`, `im:history`, `im:write`
+- **Required OAuth scopes:** `app_mentions:read`, `channels:history`, `channels:join`, `channels:manage`, `chat:write`, `groups:history`, `im:history`
 - **Subscribe to bot events:** `app_mention`, `message.im`
 
 ### 2. Run the setup wizard
