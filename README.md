@@ -18,19 +18,13 @@ A Slack router plugin for [openclaw](https://github.com/openclaw/openclaw). Conn
 openclaw plugins install @datanovallc/openclaw-slack-router
 ```
 
-Then restart your openclaw gateway:
-
-```
-openclaw gateway restart
-```
-
 ## Quick start
 
 ### 1. Create a Slack app
 
 In the [Slack app console](https://api.slack.com/apps):
 
-- **Enable Socket Mode** — generate an App Token (`xapp-...`) under Settings → Basic Information
+- **Enable Socket Mode** — generate an App Token (`xapp-...`) under Settings → Basic Information → App-Level Tokens
 - **Add a Bot Token** (`xoxb-...`) under OAuth & Permissions → Install to Workspace
 - **Required OAuth scopes:** `app_mentions:read`, `channels:history`, `channels:join`, `channels:manage`, `chat:write`, `groups:history`, `im:history`
 - **Subscribe to bot events:** `app_mention`, `message.im`
@@ -38,10 +32,10 @@ In the [Slack app console](https://api.slack.com/apps):
 ### 2. Run the setup wizard
 
 ```
-npx openclaw-slack-router init
+openclaw slack setup
 ```
 
-The wizard asks for your tokens, gateway URL, and a name for your main channel. It writes `.env` and `openclaw-slack-router.config.json`.
+The wizard asks for your tokens, gateway URL, and a name for your main channel. It writes your tokens to `~/.openclaw/.env`.
 
 ### 3. Invite the bot to your main channel
 
