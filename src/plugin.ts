@@ -90,7 +90,13 @@ const plugin = {
   register(api: PluginApi) {
     const pluginCfg = (api.pluginConfig ?? {}) as PluginConfig;
 
-    if (!pluginCfg.botToken && !pluginCfg.appToken) {
+    const hasTokens =
+      pluginCfg.botToken ||
+      pluginCfg.appToken ||
+      process.env.SLACK_BOT_TOKEN ||
+      process.env.SLACK_APP_TOKEN;
+
+    if (!hasTokens) {
       console.warn(
         "\n⚠️  openclaw-slack-router: Slack tokens not configured.\n" +
         "   Run `openclaw slack setup` before starting the gateway.\n",
@@ -116,6 +122,18 @@ const plugin = {
 
     api.registerCli(
       (ctx) => {
+        // When `openclaw pairing list` is called without a channel, default to 'slack'
+        ctx.program.hook("preAction", (_thisCmd: any, actionCmd: any) => {
+          if (
+            actionCmd.name() === "list" &&
+            actionCmd.parent?.name() === "pairing" &&
+            !actionCmd.opts().channel &&
+            !actionCmd.processedArgs?.[0]
+          ) {
+            actionCmd.processedArgs[0] = "slack";
+          }
+        });
+
         const cmd = ctx.program
           .command("slack")
           .description("Slack router plugin commands");
