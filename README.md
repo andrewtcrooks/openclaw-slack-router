@@ -23,7 +23,7 @@ In the [Slack app console](https://api.slack.com/apps), create a new app and con
 
 <!-- AUTO:install-cmd -->
 ```
-openclaw plugins install @datanovallc/openclaw-slack-router@0.1.22
+openclaw plugins install @datanovallc/openclaw-slack-router@0.1.23
 ```
 <!-- /AUTO:install-cmd -->
 
