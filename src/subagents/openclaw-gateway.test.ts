@@ -28,7 +28,7 @@ describe("createOpenclawGatewaySubagent", () => {
     expect(typeof subagent.handle).toBe("function");
   });
 
-  it("handle() calls gatewayChatSend with sessionKey=ctx.channelId and ctx.currentMessage", async () => {
+  it("handle() calls gatewayChatSend with namespaced session key and formatted message", async () => {
     mockGatewayChatSend.mockResolvedValue({
       text: "response",
       runId: "r1",
@@ -43,7 +43,7 @@ describe("createOpenclawGatewaySubagent", () => {
     expect(mockGatewayChatSend).toHaveBeenCalledWith(
       expect.objectContaining({ url: "ws://localhost:18789", token: "tok" }),
       expect.objectContaining({
-        sessionKey: "C08ABC123",
+        sessionKey: "slack:C08ABC123",
         message: "hello world",
       }),
     );
