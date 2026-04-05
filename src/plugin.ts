@@ -1,6 +1,6 @@
 import { startSlackBot, stopSlackBot } from "./bot.js";
 import { runInit } from "./commands/init.js";
-import { DEFAULT_CONFIG_PATH, loadSubagentConfig, saveSubagentConfig } from "./config.js";
+import { DEFAULT_CONFIG_PATH, loadSubagentConfig, saveSubagentConfig, OPENCLAW_ENV_PATH, parseEnvFile } from "./config.js";
 
 // Minimal types for the openclaw plugin API — no runtime dependency on openclaw required.
 // The full types are at openclaw/plugin-sdk if you want to import them as a dev dep.
@@ -90,11 +90,12 @@ const plugin = {
   register(api: PluginApi) {
     const pluginCfg = (api.pluginConfig ?? {}) as PluginConfig;
 
+    const env = parseEnvFile(OPENCLAW_ENV_PATH);
     const hasTokens =
       pluginCfg.botToken ||
       pluginCfg.appToken ||
-      process.env.SLACK_BOT_TOKEN ||
-      process.env.SLACK_APP_TOKEN;
+      env["SLACK_BOT_TOKEN"] ||
+      env["SLACK_APP_TOKEN"];
 
     if (!hasTokens) {
       console.warn(
