@@ -39,19 +39,19 @@ export async function startSlackBot(options: SlackBotOptions): Promise<void> {
 
   // Resolve bot's own user ID at startup for assistant message tagging.
   // Uses WebClient directly (before creating the Bolt app) since createApp needs botUserId.
-  const SlackBolt = await import("@slack/bolt");
-  const slackBoltModule = SlackBolt as typeof import("@slack/bolt") & {
-    default?: typeof import("@slack/bolt");
+  const SlackWebApi = await import("@slack/web-api");
+  const slackWebApiModule = SlackWebApi as typeof import("@slack/web-api") & {
+    default?: typeof import("@slack/web-api");
   };
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const slackBolt =
+  const slackWebApi =
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    ((slackBoltModule as any).App
-      ? slackBoltModule
+    ((slackWebApiModule as any).WebClient
+      ? slackWebApiModule
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      : (slackBoltModule as any).default) ?? slackBoltModule;
+      : (slackWebApiModule as any).default) ?? slackWebApiModule;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { WebClient } = slackBolt as any;
+  const { WebClient } = slackWebApi as any;
   const client = new WebClient(botToken);
   const authResult = await client.auth.test();
   const botUserId = authResult.user_id as string;
